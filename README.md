@@ -85,7 +85,8 @@ We rely on shadcn/ui for consistent UI. Prefer these components over raw HTML:
 - https://ui.shadcn.com/components To browse the entire collection
 
 To add components not yet installed on the project run the following command
-```npx shadcn@latest add <componentname>
+```bash
+npx shadcn@latest add <componentname>
 ```
 
 ### Example: Card Component
