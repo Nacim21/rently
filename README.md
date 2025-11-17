@@ -5,7 +5,7 @@
 - npm run dev
 
 
-# Rently Frontend Guide (React + shadcn/ui)
+# Rently Frontend Guide (React + shadcn/ui + tailwind)
 
 A beginner-friendly development guide for the Rently frontend.  
 This document ensures everyone follows the same structure, conventions, and UI patterns across the project.
