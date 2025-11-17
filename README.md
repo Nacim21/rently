@@ -1,8 +1,8 @@
 # Commands to clone and run
-git clone https://github.com/Nacim21/rently
-cd rently
-npm install
-npm run dev
+- git clone https://github.com/Nacim21/rently
+- cd rently
+- npm install
+- npm run dev
 
 # React + TypeScript + Vite
 
