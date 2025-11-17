@@ -1,3 +1,9 @@
+# Commands to clone and run
+- git clone https://github.com/Nacim21/rently
+- cd rently
+- npm install
+- npm run dev
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
