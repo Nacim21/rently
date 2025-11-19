@@ -1,6 +1,14 @@
 // src/pages/Payments/PaymentsPage.tsx 
 //Remember folders under "pages start with upper case
 
+import { useState } from "react"; // we import useState because later we will probably need to track filters
+// selected rows, UI changes, etc. Even if we don’t use it yet, this page
+// normally needs some local state for payments (status filter, search, etc.)
+
+// simple union type so the status can only be these 3 strings,
+//  do not get scared , this is only to avoid typos like "pendng" and makes the flow safer.
+type PaymentStatus = "Paid" | "Pending" | "Overdue";
+
 // Just the main payments page layout
 function PaymentsPage() {
 
