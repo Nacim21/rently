@@ -1,10 +1,9 @@
 // App.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { RentlyLayout } from "./components/layout/RentlyLayout";
+import { DashboardPage } from "./pages/Dashboard/DashboardPage";
 
-function DashboardPage() {
-  return <div>Dashboard content</div>;
-}
+
 function PropertiesPage() {
   return <div>Properties content</div>;
 }
