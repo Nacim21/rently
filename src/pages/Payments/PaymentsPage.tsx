@@ -2,8 +2,33 @@
 //Remember folders under "pages start with upper case
 
 import { useState } from "react"; // we import useState because later we will probably need to track filters
-// selected rows, UI changes, etc. Even if we don’t use it yet, this page
-// normally needs some local state for payments (status filter, search, etc.)
+// selected rows, UI changes, etc. Even if we dont use it yet, this page
+// normally needs some local state for payments like status filter, search
+
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+// we pull in shadcn card nacim components because this page will use a card layout to group payment info . So it looks cleaner instead of raw divs
+//esto es un easter egg
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableHeader,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+
+
+
 
 // simple union type so the status can only be these 3 strings
 //  do not get scared , this is only to avoid typos like "pendng" and makes the flow safer.
@@ -62,23 +87,34 @@ function PaymentsPage() {
 
   //this one recalculated
 return (
-    // page wrapper + background color
     <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-6xl px-6 py-6">
+      <div className="mx-auto max-w-6xl px-6 py-6 space-y-8">
+        
+        {/* ---------- Page Header ---------- */}
+        <header className="space-y-1 text-left">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Payment Management
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Track rent collection across all properties.
+          </p>
+        </header>
 
-        {/* page title + small description */}
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Payment Management
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Track rent collection across all properties.
-        </p>
+        {/* ---------- Summary row with KPI cards ---------- */}
+        <SummaryRow />
 
-        {/*  ss */}
-        <pre className="mt-4 bg-white p-4 rounded border text-xs">
-{JSON.stringify(filteredRows, null, 2)}
-        </pre>
+        {/* ---------- Monthly trend + quick stats ---------- */}
+        <div className="grid gap-4 lg:grid-cols-[2fr,1fr]">
+          <MonthlyTrendCard />
+          <QuickStatsCard />
+        </div>
 
+        {/* ---------- Payments table for current month ---------- */}
+        <CurrentMonthStatusCard
+          rows={filteredRows}
+          propertyFilter={propertyFilter}
+          onPropertyFilterChange={setPropertyFilter}
+        />
       </div>
     </div>
   );
