@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar/Navbar'
 import Maintenance from './pages/maintenance/Maintenance'
+import Messages from './pages/messages/Messages'
 import './App.css'
 
 function App() {
@@ -13,7 +14,8 @@ function App() {
         <Route path="/dashboard" element={<div>Dashboard Page (Coming Soon)</div>} />
         <Route path="/properties" element={<div>Properties Page (Coming Soon)</div>} />
         <Route path="/payments" element={<div>Payments Page (Coming Soon)</div>} />
-        <Route path="/messages" element={<div>Messages Page (Coming Soon)</div>} />
+        <Route path="/" element={<Messages />} />
+        <Route path="/messages" element={<Messages />} />
       </Routes>
     </>
   )
