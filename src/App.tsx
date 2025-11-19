@@ -2,20 +2,28 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { RentlyLayout } from "./components/layout/RentlyLayout";
 
-function DashboardPage() {
+
+// Real pages
+import PaymentsPage from "./pages/Payments/PaymentsPage";
+// 
+// TODO: import these when you build them:
+// import MaintenancePage from "./pages/Maintenance/Maintenance";
+// import DashboardPage from "./pages/Dashboard/DashboardPage";
+// import PropertiesPage from "./pages/Properties/PropertiesPage";
+// import MessagesPage from "./pages/Messages/MessagesPage";
+
+// TEMPORARY placeholders  
+function DashboardPlaceholder() {
   return <div>Dashboard content</div>;
 }
-function PropertiesPage() {
+function PropertiesPlaceholder() {
   return <div>Properties content</div>;
 }
-function PaymentsPage() {
-  return <div>Payments content</div>;
-}
-function MaintenancePage() {
-  return <div>Maintenance content</div>;
-}
-function MessagesPage() {
+function MessagesPlaceholder() {
   return <div>Messages content</div>;
+}
+function MaintanencePlaceholder() {
+  return <div>Maintanence Placeholder</div>;
 }
 
 // These are placeholder components for the respective pages. In the final implementation, they would be imported from their respective files.
@@ -24,14 +32,15 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<RentlyLayout role="Landlord" />}>
-
+        {/* Redirect root to dashboard */}
         <Route index element={<Navigate to="dashboard" replace />} />
 
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/properties" element={<PropertiesPage />} />
-        <Route path="/payments" element={<PaymentsPage />} />
-        <Route path="/maintenance" element={<MaintenancePage />} />
-        <Route path="/messages" element={<MessagesPage />} />
+        {/* Nested route paths MUST NOT start with "/" */}
+        <Route path="dashboard" element={<DashboardPlaceholder />} />
+        <Route path="properties" element={<PropertiesPlaceholder />} />
+        <Route path="payments" element={<PaymentsPage />} />
+        <Route path="maintenance" element={<MaintanencePlaceholder/>} />
+        <Route path="messages" element={<MessagesPlaceholder />} />
       </Route>
     </Routes>
   );
