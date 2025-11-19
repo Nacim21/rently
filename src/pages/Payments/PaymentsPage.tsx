@@ -120,6 +120,45 @@ return (
   );
 }
 
+
+// Summary Cards----------------------------------------
+
+function SummaryRow() {                         
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">      // layout for kpi cards
+      <SummaryCard title="Collected (Nov)" amount="$40,250" subtitle="20 of 22 units" />  // money in
+      <SummaryCard title="Pending" amount="$2,550" subtitle="2 units" />                  // waiting to be paid
+      <SummaryCard title="Overdue" amount="$0" subtitle="0 units" />                      // late payments
+      <SummaryCard title="Collection Rate" amount="94%" subtitle="+3% vs last month" />   // main percent stat
+    </div>
+  );
+}
+
+
+type SummaryCardProps = {
+  title: string;
+  amount: string;
+  subtitle: string;
+};
+
+
+// Reusable small KPI card
+function SummaryCard({ title, amount, subtitle }: SummaryCardProps) {
+  return (
+    <Card>                                                     // card wrap
+      <CardHeader className="space-y-1 pb-2 text-left">        // top area
+        <p className="text-[11px] font-medium uppercase text-muted-foreground">{title}</p>   // tiny label
+        <p className="text-2xl font-semibold leading-none">{amount}</p>                      // big number
+      </CardHeader>
+      <CardContent className="text-left">                     // bottom area
+        <p className="text-xs text-muted-foreground">{subtitle}</p>                           // small detail
+      </CardContent>
+    </Card>
+  );
+}
+
+
+
 //ensaladini estuvo aqui
 export default PaymentsPage;
 
