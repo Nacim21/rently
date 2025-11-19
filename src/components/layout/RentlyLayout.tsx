@@ -32,10 +32,10 @@ export const RentlyLayout: React.FC<RentlyLayoutProps> = ({ role = "Landlord" })
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">
-      {/* NAVBAR CLARO */}
+      {/* NAVBAR */}
       <header className=" bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
-          {/* Logo + nav */}
+
           <div className="flex items-center gap-8">
             {/* Logo */}
             <Link to="/dashboard" className="flex items-center gap-2">
@@ -47,7 +47,6 @@ export const RentlyLayout: React.FC<RentlyLayoutProps> = ({ role = "Landlord" })
               </span>
             </Link>
 
-            {/* Nav links estilo screenshot */}
             <nav className="flex items-center gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -75,7 +74,6 @@ export const RentlyLayout: React.FC<RentlyLayoutProps> = ({ role = "Landlord" })
             </nav>
           </div>
 
-          {/* Right side: role pill + logout, claros */}
           <div className="flex items-center gap-3">
             <Badge
               variant="secondary"
@@ -97,7 +95,6 @@ export const RentlyLayout: React.FC<RentlyLayoutProps> = ({ role = "Landlord" })
         </div>
       </header>
 
-      {/* CONTENIDO */}
       <main className="mx-auto flex w-full max-w-6xl flex-1 px-4 py-6">
         <Outlet />
       </main>
