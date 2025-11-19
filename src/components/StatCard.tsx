@@ -18,11 +18,11 @@ export const StatCard: React.FC<StatCardProps> = ({
   secondaryLine,
   footer,
 }) => (
-  <Card className="border-slate-200 shadow-sm rounded-2xl">
+  <Card className="border-slate-200 bg-white shadow-sm rounded-2xl">
     <CardContent className=" flex flex-col gap-3">
       <div
         className={cn(
-          "inline-flex h-10 w-10 items-center justify-center rounded-xl",
+          "inline-flex h-10 w-10 items-center justify-center rounded-full",
           iconBg
         )}
       >

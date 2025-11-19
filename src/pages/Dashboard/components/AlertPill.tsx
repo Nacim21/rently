@@ -24,7 +24,7 @@ const dotColor: Record<DashboardAlertSeverity, string> = {
 export const AlertItem: React.FC<{ alert: DashboardAlert }> = ({ alert }) => (
   <div
     className={cn(
-      "rounded-2xl border px-4 py-3 flex flex-col gap-1",
+      "rounded-2xl border bg-white px-4 py-3 flex flex-col gap-1",
       severityStyles[alert.severity]
     )}
   >

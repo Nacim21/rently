@@ -12,7 +12,7 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card";
-import { StatCard } from "./StatCard";
+import { StatCard } from "../../../components/StatCard";
 import { RentPill } from "./RentPill";
 
 /* ---------- Types para los datos que vienen del API (vía props) ---------- */
@@ -90,7 +90,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
  
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex flex-col gap-10 w-full">
       {/* HEADER: saludo cálido */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
@@ -106,7 +106,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* TOP STATS */}
       <div className="grid gap-4 md:grid-cols-4">
         <StatCard
-          icon={<Building2 className="h-5 w-5 text-blue-500" />}
+          icon={<Building2 className="h-5 w-5 rounded-full text-blue-500" />}
           iconBg="bg-blue-50"
           title="Total Units"
           primaryValue={overview.totalUnits.units.toString()}
@@ -114,7 +114,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           footer={overview.totalUnits.deltaLabel}
         />
         <StatCard
-          icon={<DollarSign className="h-5 w-5 text-emerald-500" />}
+          icon={<DollarSign className="h-5 w-5 rounded-full text-emerald-500" />}
           iconBg="bg-emerald-50"
           title="Monthly Revenue"
           primaryValue={overview.monthlyRevenue.amountLabel}
@@ -122,7 +122,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           footer={overview.monthlyRevenue.deltaLabel}
         />
         <StatCard
-          icon={<Users className="h-5 w-5 text-indigo-500" />}
+          icon={<Users className="h-5 w-5 rounded-full text-indigo-500" />}
           iconBg="bg-indigo-50"
           title="Occupancy Rate"
           primaryValue={overview.occupancy.rateLabel}
@@ -130,7 +130,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           footer={overview.occupancy.deltaLabel}
         />
         <StatCard 
-          icon={<Wrench className="h-5 w-5 text-orange-500" />}
+          icon={<Wrench className="h-5 w-5 rounded-full text-orange-500" />}
           iconBg="bg-orange-50"
           title="Open Requests"
           primaryValue={overview.openRequests.count.toString()}
@@ -142,7 +142,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       <div className="grid gap-4 lg:grid-cols-[2fr,1.2fr]">
         {/* RENT COLLECTION */}
-        <Card className="border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <Card className="bg-white border-slate-200 shadow-sm rounded-2xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-base font-semibold text-slate-900">
               Rent Collection
@@ -193,7 +193,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </Card>
 
         {/* ALERTS */}
-        <Card className="border-slate-200 shadow-sm rounded-2xl">
+        <Card className=" bg-white border-slate-200 shadow-sm rounded-2xl">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base font-semibold text-slate-900">
               Alerts

@@ -4,76 +4,285 @@
 - npm install
 - npm run dev
 
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Rently Frontend Guide (React + shadcn/ui + tailwind)
 
-Currently, two official plugins are available:
+A beginner-friendly development guide for the Rently frontend.  
+This document ensures everyone follows the same structure, conventions, and UI patterns across the project.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 1. Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+We use a clean, predictable folder layout:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+  app/                  # App entry and routing
+  pages/                # Page-level components (screens)
+    Dashboard/
+      DashboardPage.tsx
+      components/
+    Leases/
+      LeasesPage.tsx
+      components/
+    Payments/
+      PaymentsPage.tsx
+      components/
+    Maintenance/
+      MaintenancePage.tsx
+      components/
+    Auth/
+      LoginPage.tsx
+      RegisterPage.tsx
+  components/
+    layout/             # AppShell, Sidebar, Header, etc.
+    ui/                 # shadcn components
+  features/             # Domain logic and shared components
+  hooks/                # Generic reusable hooks
+  lib/                  # Helpers, formatters, constants
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Rules
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Components used in one page → place them in that page’s `components/`.
+- Reusable/shared components → `src/components/`.
+- Domain‑specific shared components → `src/features/<domain>/`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 2. Naming Conventions
+
+- **PascalCase** for components (`LeaseTable`, `PaymentCard`)
+- **One component per file** (file name = component name)
+- **Page components** end with `Page` (e.g., `DashboardPage`)
+
+Example:
+
+```tsx
+// src/pages/Payments/PaymentsPage.tsx
+export function PaymentsPage() {
+  return <div>Payments</div>;
+}
 ```
+
+---
+
+## 3. Using shadcn/ui Components
+
+We rely on shadcn/ui for consistent UI. Prefer these components over raw HTML:
+
+- Button
+- Input
+- Label
+- Card
+- Table
+- Badge
+- Dialog
+- Tabs
+- Select
+- DropdownMenu
+- https://ui.shadcn.com/components To browse the entire collection
+
+To add components not yet installed on the project run the following command
+```bash
+npx shadcn@latest add <componentname>
+```
+
+### Example: Card Component
+
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+export function NextPaymentCard({ amount, dueDate }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Next Payment</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl font-semibold">${amount}</p>
+        <p className="text-sm text-muted-foreground">Due: {dueDate}</p>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## 4. Creating a New Page
+
+### Step 1 — Create the Folder
+
+```
+src/pages/Maintenance/
+```
+
+### Step 2 — Create `MaintenancePage.tsx`
+
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { MaintenanceTable } from "./components/MaintenanceTable";
+
+export function MaintenancePage() {
+  const requests = [
+    { id: 1, title: "Leaky faucet", status: "New" },
+    { id: 2, title: "AC not working", status: "In Progress" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Maintenance Requests
+        </h1>
+        <Button>New Request</Button>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">All Requests</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <MaintenanceTable requests={requests} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+### Step 3 — Add `MaintenanceTable.tsx`
+
+```tsx
+import {
+  Table, TableHeader, TableRow, TableHead,
+  TableBody, TableCell
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+
+export function MaintenanceTable({ requests }) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>ID</TableHead>
+          <TableHead>Title</TableHead>
+          <TableHead>Status</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {requests.map((r) => (
+          <TableRow key={r.id}>
+            <TableCell>{r.id}</TableCell>
+            <TableCell>{r.title}</TableCell>
+            <TableCell>
+              <Badge>{r.status}</Badge>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+```
+
+---
+
+## 5. Layout & AppShell
+
+All logged‑in pages use a common layout:
+
+```tsx
+// src/components/layout/AppShell.tsx
+import { Sidebar } from "./Sidebar";
+
+export function AppShell({ children }) {
+  return (
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <main className="flex-1 px-6 py-6 bg-muted/30">{children}</main>
+    </div>
+  );
+}
+```
+
+---
+
+## 6. State & Data (Beginner Version)
+
+Use simple React state until backend integration:
+
+```tsx
+const [payments, setPayments] = useState([]);
+
+useEffect(() => {
+  setPayments([
+    { id: 1, amount: 500, status: "Paid" },
+    { id: 2, amount: 750, status: "Pending" },
+  ]);
+}, []);
+```
+
+Later we’ll migrate to custom hooks.
+
+---
+
+## 7. Tailwind Styling Rules
+
+Use utility classes for layout and spacing:
+
+- `space-y-4`
+- `p-6`
+- `flex items-center justify-between`
+- `text-2xl font-semibold`
+- `text-muted-foreground`
+
+Example:
+
+```tsx
+<div className="flex items-center justify-between mb-4">
+  <h1 className="text-2xl font-semibold tracking-tight">Leases</h1>
+  <Button>New Lease</Button>
+</div>
+```
+
+---
+
+## 8. Rently UX Patterns
+
+### Dashboards  
+- Cards at the top  
+- Tables below  
+- Main actions on the top-right  
+
+### Forms  
+- `Label` + `Input` pairs  
+- Group fields with `space-y-4`  
+
+### Status Indicators  
+Use `Badge` for statuses like:
+
+- `Paid`, `Pending`, `Overdue`
+- `New`, `In Progress`, `Completed`
+
+---
+
+## 9. Code Review Checklist
+
+Before merging:
+
+```
+[ ] File is in the correct folder
+[ ] Using shadcn/ui components
+[ ] Page styling matches existing pages
+[ ] Component has clear naming
+[ ] No unnecessary duplication
+[ ] Component is small and focused
+```
+
+---
+
+If you need help with setup or structure, ask anytime.

@@ -29,3 +29,7 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+
+package-lock.json
+package.json

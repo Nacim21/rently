@@ -27,15 +27,16 @@ const navItems = [
   { label: "Messages", href: "/messages", icon: MessageCircle },
 ];
 
-export const RentlyLayout: React.FC<RentlyLayoutProps> = ({ role = "Landlord" }) => {
+export const RentlyLayout: React.FC<RentlyLayoutProps> = ({
+  role = "Landlord",
+}) => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* NAVBAR */}
-      <header className=" bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
-
+      <header className="bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 lg:px-8">
           <div className="flex items-center gap-8">
             {/* Logo */}
             <Link to="/dashboard" className="flex items-center gap-2">
@@ -62,8 +63,7 @@ export const RentlyLayout: React.FC<RentlyLayoutProps> = ({ role = "Landlord" })
                     className={cn(
                       "flex items-center gap-2 border-b-2 border-transparent px-3 py-2 text-sm font-medium transition-all",
                       "text-slate-500 hover:text-slate-900 hover:border-slate-200",
-                      isActive &&
-                        "text-primary border-primary bg-primary/5"
+                      isActive && "text-primary border-primary bg-primary/5"
                     )}
                   >
                     <Icon className="h-4 w-4" />
@@ -95,8 +95,11 @@ export const RentlyLayout: React.FC<RentlyLayoutProps> = ({ role = "Landlord" })
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 px-4 py-6">
-        <Outlet />
+      {/* MAIN CONTENT */}
+      <main className="flex-1">
+        <div className="mx-auto w-full max-w-7xl px-6 py-8 lg:px-8">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

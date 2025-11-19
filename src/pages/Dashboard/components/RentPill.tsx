@@ -15,7 +15,7 @@ export const RentPill: React.FC<RentPillProps> = ({
 }) => (
   <div
     className={cn(
-      "rounded-2xl border px-4 py-4 flex flex-col gap-1",
+      "rounded-2xl border px-4 bg-white py-4 flex flex-col gap-1",
       className
     )}
   >
