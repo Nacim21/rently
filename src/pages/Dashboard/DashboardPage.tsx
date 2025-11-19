@@ -102,6 +102,7 @@ export const DashboardPage: React.FC = () => {
       periodOptions={periodOptions}
       currentPeriodValue={currentPeriod}
       onPeriodChange={setCurrentPeriod}
+      alerts={alerts}
       // rentCollectionChartSlot={<YourChartComponent data={...} />} // later
     />
   );

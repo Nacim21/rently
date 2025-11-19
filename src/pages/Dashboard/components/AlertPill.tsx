@@ -1,4 +1,14 @@
+import { cn } from "@/lib/utils";
+// import type { DashboardAlert, DashboardAlertSeverity } from "./Dashboard";
+export type DashboardAlertSeverity = "high" | "medium" | "low";
 
+export type DashboardAlert = {
+  id: string;
+  severity: DashboardAlertSeverity;
+  title: string;
+  description: string;
+  timeAgoLabel: string;         // ej. "2 hours ago"
+};
 const severityStyles: Record<DashboardAlertSeverity, string> = {
   high: "bg-rose-50 border-rose-100",
   medium: "bg-amber-50 border-amber-100",
@@ -11,7 +21,7 @@ const dotColor: Record<DashboardAlertSeverity, string> = {
   low: "bg-sky-500",
 };
 
-const AlertItem: React.FC<{ alert: DashboardAlert }> = ({ alert }) => (
+export const AlertItem: React.FC<{ alert: DashboardAlert }> = ({ alert }) => (
   <div
     className={cn(
       "rounded-2xl border px-4 py-3 flex flex-col gap-1",
