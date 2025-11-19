@@ -2,14 +2,14 @@
 import React from "react";
 import {
   Dashboard
-} from "./Dashboard";
+} from "./components/Dashboard";
 
 import type {
   OverviewStats,
   RentCollection,
-  PeriodOption,
-  DashboardAlert,
-} from "./Dashboard";
+  PeriodOption
+} from "./components/Dashboard";
+import type { DashboardAlert } from "./components/AlertPill";
 
 export const DashboardPage: React.FC = () => {
   // Period state – later you can sync this with your API query params
@@ -102,7 +102,6 @@ export const DashboardPage: React.FC = () => {
       periodOptions={periodOptions}
       currentPeriodValue={currentPeriod}
       onPeriodChange={setCurrentPeriod}
-      alerts={alerts}
       // rentCollectionChartSlot={<YourChartComponent data={...} />} // later
     />
   );
