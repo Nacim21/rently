@@ -1,4 +1,4 @@
-// v1: super barebones register page, only name input
+// al rato la hago
 import { FormEvent, useState } from "react";
 
 import { Button } from "@/components/ui/button";

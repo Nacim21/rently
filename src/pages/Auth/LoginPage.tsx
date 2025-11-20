@@ -1,7 +1,9 @@
 import { FormEvent, useRef, useState, useEffect } from "react";
-import { Link, useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { Lock, X, Home } from "lucide-react";
- 
+import tenantImg from "@/assets/auth/login-tenant.png";
+import landlordImg from "@/assets/auth/login-landlord.png";
+
 
 import { Button } from "@/components/ui/button";
 import {
@@ -53,7 +55,7 @@ type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { currentUser, login } = useAuth();
+  const { currentUser, login } = useAuth(); // we also grab currentUser so we can block this page when already logged in
 
   const [formRole, setFormRole] = useState<FormRole | null>(null);
   const [username, setUsername] = useState("");
@@ -69,6 +71,12 @@ export function LoginPage() {
       usernameInputRef.current.focus();
     }
   }, [formRole]);
+
+  // if a user is already logged in we dont want them to see the public auth / landing again
+  // they go straight to the dashboard instead
+  if (currentUser) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const openForm = (role: FormRole) => {
     setFormRole(role);
@@ -103,12 +111,6 @@ export function LoginPage() {
 
   const heroSubtitle =
     "Streamline rent collection, track maintenance, and communicate seamlessly. Built for tenants, landlords, and property managers.";
-  
-   // if user is already logged in, don't let them see the auth landing
-  if (currentUser) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
