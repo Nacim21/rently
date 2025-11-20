@@ -6,7 +6,7 @@ export type User = {
   id: number;
   name: string;
   role: UserRole;
-  password: string;  // Just for the prototype, DO NOT RAGE xd
+  password: string; // Just for the prototype, DO NOT RAGE xd
 };
 
 export type AuthResult = {
@@ -26,13 +26,12 @@ type LoginFn = {
   (name: string, role: UserRole): AuthResult;
 };
 
-
-
 type AuthContextValue = {
   currentUser: User | null;
   users: User[];
-  registerUser: (name: string, role: UserRole) => { success: boolean; message?: string };
-  login: (name: string, role: UserRole) => { success: boolean; message?: string };
+  // keep API surface small but typed, we now use the overloaded fn types above
+  registerUser: RegisterFn;
+  login: LoginFn;
   logout: () => void;
 };
 
@@ -41,6 +40,10 @@ const STORAGE_KEYS = {
   currentUser: "rently_current_user",
 };
 
+const COOKIE_KEYS = {
+  // cookie key where we stash a tiny current user snapshot
+  currentUser: "rently_current_user",
+};
 
 // simple seed users for demos
 const seedUsers: User[] = [
@@ -56,11 +59,10 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 // tiny util that gets stuff from local storage and parses it
 function readStorage<T>(key: string): T | null {
- 
-  if (typeof window === "undefined") return null;  // if we run on server there is no window so we just bail out
-  const stored = window.localStorage.getItem(key);  // grab raw string from browser storage with this key
+  if (typeof window === "undefined") return null; // if we run on server there is no window so we just bail out
+  const stored = window.localStorage.getItem(key); // grab raw string from browser storage with this key
 
-  if (!stored) return null; 
+  if (!stored) return null;
   // if nothing saved for this key just give back null
 
   try {
@@ -99,9 +101,6 @@ function setCurrentUserCookie(user: User | null) {
     payload
   )}; Max-Age=${maxAgeSeconds}; path=/`;
 }
-
-
-
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -150,7 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
 
-    // optional cookie for simple client-side persistence
+    //  cookie for simple client-side persistence
     setCurrentUserCookie(user);
   };
 
@@ -240,7 +239,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // new signature: login(name, password, role)
     const password = passwordOrRole.trim();
-    const role = maybeRole;
+    const role = maybeRole as UserRole; // here we know we are in the "new" branch so role is defined
 
     if (!password) {
       return { success: false, message: "Please enter your password" };

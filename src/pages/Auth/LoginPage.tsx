@@ -53,7 +53,7 @@ type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { currentUser, login } = useAuth();
 
   const [formRole, setFormRole] = useState<FormRole | null>(null);
   const [username, setUsername] = useState("");
@@ -103,6 +103,12 @@ export function LoginPage() {
 
   const heroSubtitle =
     "Streamline rent collection, track maintenance, and communicate seamlessly. Built for tenants, landlords, and property managers.";
+  
+   // if user is already logged in, don't let them see the auth landing
+  if (currentUser) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
