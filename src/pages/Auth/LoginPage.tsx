@@ -1,9 +1,11 @@
 //  login super simple, lets keep in mind that due to lack of time we will ony keep track of name and role
-import { FormEvent, useState } from "react";
-
+import { type FormEvent, useState,useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Home, LogIn, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import type { UserRole } from "@/lib/auth"; // using the type of  role from the auth
 
 
@@ -13,7 +15,7 @@ const roles: UserRole[] = ["Landlord", "Tenant"];
 
 export function LoginPage() {
    const navigate = useNavigate();
-   const { login } = useAuth(); // auth hook
+   const { login,users } = useAuth(); // auth hook
 
   // storing name 
   const [name, setName] = useState("");
@@ -46,7 +48,7 @@ export function LoginPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl font-semibold">
-              Login Rently (v1 super simple)
+              Login Rently 
             </CardTitle>
           </CardHeader>
 
@@ -55,18 +57,18 @@ export function LoginPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">
-                  Nombre
+                  Name
                 </label>
                 <Input
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  placeholder="Ej. Cesar Tirado"
+                  placeholder="Ex. Miguel Matchas"
                 />
               </div>
             </CardContent>
             <CardFooter>
               <Button type="submit" className="w-full">
-                Entrar
+                Submit
               </Button>
             </CardFooter>
           </form>
