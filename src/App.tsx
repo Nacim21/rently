@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 // Real pages
 import { DashboardPage } from "./pages/Dashboard/DashboardPage";
+import { LoginPage } from "./pages/Auth/LoginPage";
+import { RegisterPage } from "./pages/Auth/RegisterPage";
 import { RentlyLayout } from "./components/layout/RentlyLayout";
 import PaymentsPage from "./pages/Payments/PaymentsPage";
 import MessagesPage from "./pages/Messages/MessagesPage";
@@ -38,7 +40,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 
 
 export default function App() {
-  const { currentUser logout } = useAuth() //// for showing name and logout inside layout
+  const { currentUser, logout } = useAuth() //// for showing name and logout inside layout
 
   return (
     <Routes>
