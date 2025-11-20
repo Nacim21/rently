@@ -31,6 +31,8 @@ const navItems = [
 
 export const RentlyLayout: React.FC<RentlyLayoutProps> = ({
   role = "Landlord",
+  userName,
+  onLogout,
 }) => {
   const location = useLocation();
 
@@ -77,6 +79,14 @@ export const RentlyLayout: React.FC<RentlyLayoutProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
+
+            {userName ? (
+              <div className="hidden text-right sm:flex sm:flex-col">
+                <span className="text-sm font-medium text-slate-900">{userName}</span>
+                <span className="text-xs text-slate-500">Sesión activa</span>
+              </div>
+            ) : null}
+
             <Badge
               variant="secondary"
               className="rounded-full px-4 py-1 text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"
@@ -88,7 +98,7 @@ export const RentlyLayout: React.FC<RentlyLayoutProps> = ({
               variant="ghost"
               size="sm"
               className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 hover:bg-slate-100"
-              onClick={() => console.log("logout clicked")}
+              onClick={onLogout}
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
