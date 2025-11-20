@@ -4,16 +4,24 @@ import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import type { UserRole } from "@/lib/auth"; // using the type of  role from the auth
+
+
+// fixed list of roles que that we will use as buttons
+const roles: UserRole[] = ["Landlord", "Tenant"];
+
 
 export function LoginPage() {
   // storing name 
   const [name, setName] = useState("");
 
   // basic handler for submit, this is not conected to auth yet 
+  const [role, setRole] = useState<UserRole>("Landlord");0
+
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-    // we will later call the auth
-    console.log("login with name:", name);
+    // twe need  useAuth().login
+    console.log("login with:", { name, role });
   };
 
   return (
