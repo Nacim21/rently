@@ -1,0 +1,53 @@
+//  login super simple, lets keep in mind that due to lack of time we will ony keep track of name and role
+import { FormEvent, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+
+export function LoginPage() {
+  // storing name 
+  const [name, setName] = useState("");
+
+  // basic handler for submit, this is not conected to auth yet 
+  const onSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    // we will later call the auth
+    console.log("login with name:", name);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-md px-6 py-10">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold">
+              Login Rently (v1 super simple)
+            </CardTitle>
+          </CardHeader>
+
+          {/* form sencillito with an input and a button */}
+          <form onSubmit={onSubmit}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Nombre
+                </label>
+                <Input
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder="Ej. Cesar Tirado"
+                />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button type="submit" className="w-full">
+                Entrar
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
+    </div>
+  );
+}
