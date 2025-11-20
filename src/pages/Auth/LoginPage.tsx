@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import type { UserRole } from "@/lib/auth"; // using the type of  role from the auth
+import type { useAuth, UserRole } from "@/lib/auth"; // using the type of  role from the auth
 
 
 // fixed list of roles que that we will use as buttons
@@ -14,20 +14,16 @@ const roles: UserRole[] = ["Landlord", "Tenant"];
 
 
 export function LoginPage() {
-   const navigate = useNavigate();
-   const { login,users } = useAuth(); // auth hook
+    const navigate = useNavigate();
+    const { login,users } = useAuth(); // auth hook  
+    const [name, setName] = useState(""); // storing name 
+    const [role, setRole] = useState<UserRole>("Landlord"); // basic handler for submit, this is not conected to auth yet 
+    const [error, setError] = useState<string | null>(null);
 
-  // storing name 
-  const [name, setName] = useState("");
-
-  // basic handler for submit, this is not conected to auth yet 
-  const [role, setRole] = useState<UserRole>("Landlord");0
+    const roleUsers = useMemo(() => users.filter((user) => user.role === role), [role, users]);
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-
-    // old error before trying to login again
-    setError(null);
 
     // we call the login function from context
     const result = login(name, role);
