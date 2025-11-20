@@ -1,19 +1,33 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
 
-// simple union type for the kind of user we support in this demo
-// later we could add more roles here, but for now just these 2
 export type UserRole = "Landlord" | "Tenant";
 
-// basic shape of a user in our fake auth system
-// this is what we keep in state and in localStorage
 export type User = {
   id: number;
   name: string;
   role: UserRole;
+  password: string;  // Just for the prototype, DO NOT RAGE xd
 };
 
-// this is what the auth context exposes to the rest of the app
-// kind of like our "mini auth api" for the frontend
+export type AuthResult = {
+  success: boolean;
+  message?: string;
+};
+
+type RegisterFn = {
+  (name: string, password: string, role: UserRole): AuthResult;
+  // kept for backwards compatibility with older screens that only pass name + role
+  (name: string, role: UserRole): AuthResult;
+};
+
+type LoginFn = {
+  (name: string, password: string, role: UserRole): AuthResult;
+  // legacy signature: name + role (no password check)
+  (name: string, role: UserRole): AuthResult;
+};
+
+
+
 type AuthContextValue = {
   currentUser: User | null;
   users: User[];
@@ -22,60 +36,99 @@ type AuthContextValue = {
   logout: () => void;
 };
 
-// just keeping keys in one place so we dont mistype them
-// also easier to change later if we rename localstorage keys
 const STORAGE_KEYS = {
   users: "rently_users",
   currentUser: "rently_current_user",
 };
 
-// some seed users so the app is not totally empty on the first load
-// this is only for dev/demo, in a real app users come from backend
+
+// simple seed users for demos
 const seedUsers: User[] = [
-  { id: 1, name: "Cesar Tirado", role: "Landlord" },
-  { id: 2, name: "Sergio Rocha", role: "Tenant" },
-  { id: 3, name: "Dulce Santos", role: "Tenant" },
-  { id: 4, name: "Emiliano de Sanchez", role: "Landlord" },
-  { id: 5, name: "Ashraful Garcia", role: "Tenant" },
-  { id: 6, name: "Dulce Santos", role: "Tenant" },
+  { id: 1, name: "Cesar Tirado", role: "Landlord", password: "123456" },
+  { id: 2, name: "Juan", role: "Tenant", password: "123456" },
+  { id: 3, name: "Dulce Santos", role: "Tenant", password: "123456" },
+  { id: 4, name: "Emiliano Garcia", role: "Landlord", password: "123456" },
+  { id: 5, name: "Christian Serbin", role: "Tenant", password: "123456" },
+  { id: 6, name: "Ashrafull Elias", role: "Tenant", password: "123456" },
 ];
 
-// we start the context as undefined so we can throw if someone uses it wrong
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-// small helper to read and parse json from localStorage in a safe way
-// we guard for server side (no window) and invalid json
+// tiny util that gets stuff from local storage and parses it
 function readStorage<T>(key: string): T | null {
-  if (typeof window === "undefined") return null;
-  const stored = window.localStorage.getItem(key);
-  if (!stored) return null;
+ 
+  if (typeof window === "undefined") return null;  // if we run on server there is no window so we just bail out
+  const stored = window.localStorage.getItem(key);  // grab raw string from browser storage with this key
+
+  if (!stored) return null; 
+  // if nothing saved for this key just give back null
 
   try {
+    // try to turn json string into real type
     return JSON.parse(stored) as T;
   } catch (error) {
-    // if something goes wrong we just log it and ignore that value
+    // if parse explodes we log and act like there was nothing saved
     console.error(`Failed to parse ${key} from localStorage`, error);
     return null;
   }
 }
 
-// this wraps the app and provides auth state + actions with React context
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // we lazy-init users from localStorage so we dont do this on every render
-  // if storage is empty we fall back to the seedUsers array
-  const [users, setUsers] = useState<User[]>(() => {
-    const fromStorage = readStorage<User[]>(STORAGE_KEYS.users);
-    return fromStorage?.length ? fromStorage : seedUsers;
+// helper to sync current user into a cookie so other parts can read it
+function setCurrentUserCookie(user: User | null) {
+  // same deal if there is no document we just skip
+  if (typeof document === "undefined") return;
+
+  if (!user) {
+    // clear cookie when user logs out or is missing
+    document.cookie = `${COOKIE_KEYS.currentUser}=; Max-Age=0; path=/`;
+    return;
+  }
+
+  // build a tiny payload with user info no password only basic stuff
+  const payload = JSON.stringify({
+    id: user.id,
+    name: user.name,
+    role: user.role,
   });
 
-  // same idea here, but for the currently logged in user
+  // cookie lives for seven days feels ok for a demo app
+  const maxAgeSeconds = 7 * 24 * 60 * 60; // 7 days
+
+  // stash user info in cookie so next page loads can read it
+  document.cookie = `${COOKIE_KEYS.currentUser}=${encodeURIComponent(
+    payload
+  )}; Max-Age=${maxAgeSeconds}; path=/`;
+}
+
+
+
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [users, setUsers] = useState<User[]>(() => {
+    const fromStorage = readStorage<User[]>(STORAGE_KEYS.users);
+
+    if (fromStorage && fromStorage.length) {
+      // migrate older user objects that might not have passwords
+      return fromStorage.map((u, index) => ({
+        ...u,
+        password:
+          (u as any).password && typeof (u as any).password === "string"
+            ? (u as any).password
+            : "123456", // default fallback just so old data still works
+        id: u.id ?? index + 1,
+      }));
+    }
+
+    return seedUsers;
+  });
+
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const fromStorage = readStorage<User>(STORAGE_KEYS.currentUser);
     return fromStorage ?? null;
   });
 
-  // helper that updates state and also writes users to localStorage
-  // this keeps our source of truth in one place
   const persistUsers = (next: User[]) => {
     setUsers(next);
     if (typeof window !== "undefined") {
@@ -83,42 +136,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // same pattern but for the currentUser
-  // if user is null we remove the key (logout case)
   const persistCurrentUser = (user: User | null) => {
     setCurrentUser(user);
+
     if (typeof window !== "undefined") {
       if (user) {
-        window.localStorage.setItem(STORAGE_KEYS.currentUser, JSON.stringify(user));
+        window.localStorage.setItem(
+          STORAGE_KEYS.currentUser,
+          JSON.stringify(user)
+        );
       } else {
         window.localStorage.removeItem(STORAGE_KEYS.currentUser);
       }
     }
+
+    // optional cookie for simple client-side persistence
+    setCurrentUserCookie(user);
   };
 
-  // simple “fake signup” that just appends to the users list
-  // and logs the user in right away
-  const registerUser = (name: string, role: UserRole) => {
+  const registerUser: RegisterFn = (
+    name: string,
+    passwordOrRole: string | UserRole,
+    maybeRole?: UserRole
+  ): AuthResult => {
     const trimmedName = name.trim();
     if (!trimmedName) {
-      // this message is meant to be shown on the UI
       return { success: false, message: "Please enter a name" };
     }
 
-    // avoid duplicate user with same name + role, we compare case insensitive
+    let password: string;
+    let role: UserRole;
+
+    // new signature: registerUser(name, password, role)
+    if (typeof passwordOrRole === "string" && maybeRole) {
+      password = passwordOrRole.trim();
+      role = maybeRole;
+    } else {
+      // legacy signature: registerUser(name, role)
+      password = "123456"; // default password for old flows
+      role = passwordOrRole as UserRole;
+    }
+
+    if (!password) {
+      return { success: false, message: "Please enter a password" };
+    }
+
     const exists = users.some(
-      (user) => user.name.toLowerCase() === trimmedName.toLowerCase() && user.role === role
+      (user) =>
+        user.name.toLowerCase() === trimmedName.toLowerCase() &&
+        user.role === role
     );
 
     if (exists) {
-      return { success: false, message: "That user already exists. Try logging in instead." };
+      return {
+        success: false,
+        message: "That user already exists. Try logging in instead.",
+      };
     }
 
-    // using Date.now() as a quick id generator, ok for this mock
     const newUser: User = {
       id: Date.now(),
       name: trimmedName,
       role,
+      password,
     };
 
     const nextUsers = [...users, newUser];
@@ -127,48 +207,95 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true };
   };
 
-  // fake login: we just look for a user with same name + role in our array
-  const login = (name: string, role: UserRole) => {
+  const login: LoginFn = (
+    name: string,
+    passwordOrRole: string | UserRole,
+    maybeRole?: UserRole
+  ): AuthResult => {
     const trimmedName = name.trim();
     if (!trimmedName) {
-      return { success: false, message: "Please enter your name" };
+      return { success: false, message: "Please enter your username" };
     }
 
-    const match = users.find(
-      (user) => user.name.toLowerCase() === trimmedName.toLowerCase() && user.role === role
+    // legacy signature: login(name, role) — no password check, used only by old UI
+    if (typeof passwordOrRole !== "string" || !maybeRole) {
+      const role = passwordOrRole as UserRole;
+
+      const match = users.find(
+        (user) =>
+          user.name.toLowerCase() === trimmedName.toLowerCase() &&
+          user.role === role
+      );
+
+      if (!match) {
+        return {
+          success: false,
+          message: "No user found for that name and role",
+        };
+      }
+
+      persistCurrentUser(match);
+      return { success: true };
+    }
+
+    // new signature: login(name, password, role)
+    const password = passwordOrRole.trim();
+    const role = maybeRole;
+
+    if (!password) {
+      return { success: false, message: "Please enter your password" };
+    }
+
+    const byName = users.filter(
+      (user) => user.name.toLowerCase() === trimmedName.toLowerCase()
     );
 
-    if (!match) {
-      // no match means user never registered with this role
-      return { success: false, message: "No user found for that name and role" };
+    if (!byName.length) {
+      return { success: false, message: "No user found with that name" };
     }
 
-    persistCurrentUser(match);
+    const byNameAndRole = byName.filter((user) => user.role === role);
+
+    if (!byNameAndRole.length) {
+      return {
+        success: false,
+        message: `We found "${name}", but not as a ${role}. Check your role and try again.`,
+      };
+    }
+
+    const userForRole = byNameAndRole[0];
+
+    if (userForRole.password !== password) {
+      return { success: false, message: "Incorrect password" };
+    }
+
+    persistCurrentUser(userForRole);
     return { success: true };
   };
 
-  // simple logout, we just clear currentUser everywhere
   const logout = () => {
     persistCurrentUser(null);
   };
 
-  // we memo the context value so consumers dont re-render on every keystroke
-  // only when users or currentUser actually change
   const value = useMemo(
-    () => ({ currentUser, users, registerUser, login, logout }),
+    () => ({
+      currentUser,
+      users,
+      registerUser,
+      login,
+      logout,
+    }),
     [currentUser, users]
   );
 
-  // this is the actual provider that wraps the rest of the app
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  );
 };
 
-// small custom hook so components can just call useAuth()
-// also we enforce the rule that it must be used under AuthProvider
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    // if you see this error, probably you forgot to wrap the app in <AuthProvider>
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;

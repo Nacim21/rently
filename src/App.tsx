@@ -7,8 +7,9 @@ import { LoginPage } from "./pages/Auth/LoginPage";
 import { RegisterPage } from "./pages/Auth/RegisterPage";
 import { RentlyLayout } from "./components/layout/RentlyLayout";
 import PaymentsPage from "./pages/Payments/PaymentsPage";
-import MessagesPage from "./pages/Messages/MessagesPage";
+import MessagesPage from "./pages/messages/MessagesPage";
 import { useAuth } from "./lib/auth";
+import type { JSX } from "react";
 
 
 // 
@@ -73,7 +74,7 @@ export default function App() {
         <Route index element={<Navigate to="dashboard" replace />} />
 
         {/* nested pages below here must not start with slash or router freaks out */}
-        <Route path="dashboard" element={<DashboardPlaceholder />} />
+        <Route path="dashboard" element={<DashboardPage/>} />
         <Route path="properties" element={<PropertiesPlaceholder />} />
         <Route path="payments" element={<PaymentsPage />} />
         <Route path="maintenance" element={<MaintanencePlaceholder />} />
