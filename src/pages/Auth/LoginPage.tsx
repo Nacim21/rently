@@ -1,6 +1,7 @@
 import { FormEvent, useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { Lock, X, Home } from "lucide-react";
+ 
 
 import { Button } from "@/components/ui/button";
 import {
