@@ -71,6 +71,7 @@ function readStorage<T>(key: string): T | null {
   } catch (error) {
     // if parse explodes we log and act like there was nothing saved
     console.error(`Failed to parse ${key} from localStorage`, error);
+     //Emiliano no vuelvas a 
     return null;
   }
 }
@@ -286,7 +287,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }),
     [currentUser, users]
   );
-
+ 
   return (
     <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
   );

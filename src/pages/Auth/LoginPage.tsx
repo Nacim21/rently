@@ -143,11 +143,14 @@ export function LoginPage() {
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4">
                 {/* simple image placeholder per login type */}
-                <div className="mb-2 flex h-24 w-full items-center justify-center rounded-md border border-dashed border-slate-200 bg-slate-50 text-xs text-slate-400">
-                  {formRole === "Tenant"
-                    ? "Tenant login image placeholder"
-                    : "Landlord login image placeholder"}
-                </div>
+                <div className="flex h-24 w-full items-center justify-center mb-2">
+                    <img
+                        src={formRole === "Tenant" ? tenantImg : landlordImg}
+                        alt={`${formRole} login`}
+                        className="h-full rounded-md object-contain"
+                    />
+                    </div>
+
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">
