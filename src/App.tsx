@@ -1,11 +1,12 @@
 // App.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
-import { RentlyLayout } from "./components/layout/RentlyLayout";
 
 // Real pages
 import { DashboardPage } from "./pages/Dashboard/DashboardPage";
+import { RentlyLayout } from "./components/layout/RentlyLayout";
 import PaymentsPage from "./pages/Payments/PaymentsPage";
-import MessagesPage from "./pages/messages/MessagesPage";
+import MessagesPage from "./pages/Messages/MessagesPage";
+
 
 
 // 
@@ -22,6 +23,21 @@ function MaintanencePlaceholder() {
 }
 
 // These are placeholder components for the respective pages. In the final implementation, they would be imported from their respective files.
+
+
+//// This func wraps pages that need user to be loged in if no user then it kicks back to login page,  Nacim you wanna do this a global component too? like Ashraful? 
+function RequireAuth({ children }: { children: JSX.Element }) {
+  const { currentUser } = useAuth();  //// grab the user from your auth hook
+  if (!currentUser) {                 //// if user is null or undefined
+    return <Navigate to="/auth/login" replace />; //// push user to login page
+  }
+
+  return children; //// if user exist then show the children page normally
+}
+
+
+
+
 
 export default function App() {
   return (
