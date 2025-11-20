@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 
 type RentlyLayoutProps = {
   role?: "Landlord" | "Tenant";
+  userName?: string;
+  onLogout?: () => void;
 };
 
 const navItems = [
