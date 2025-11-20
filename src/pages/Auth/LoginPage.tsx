@@ -12,6 +12,9 @@ const roles: UserRole[] = ["Landlord", "Tenant"];
 
 
 export function LoginPage() {
+   const navigate = useNavigate();
+   const { login } = useAuth(); // auth hook
+
   // storing name 
   const [name, setName] = useState("");
 
@@ -20,8 +23,21 @@ export function LoginPage() {
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-    // twe need  useAuth().login
-    console.log("login with:", { name, role });
+
+    // old error before trying to login again
+    setError(null);
+
+    // we call the login function from context
+    const result = login(name, role);
+
+    if (result.success) {
+      // if it succeed it will lead to dashboard
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
+    // if didnt succeed, it will show the message
+    setError(result.message ?? "Unable to login");
   };
 
   return (
