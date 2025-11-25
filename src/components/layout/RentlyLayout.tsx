@@ -1,6 +1,6 @@
 // RentlyLayout.tsx
 import React from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, Outlet,useNavigate } from "react-router-dom";
 import {
   Home,
   LayoutDashboard,
@@ -9,7 +9,11 @@ import {
   Wrench,
   MessageCircle,
   LogOut,
+  Check,
+  Lock,
+  UserPlus,
 } from "lucide-react";
+
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

@@ -1,9 +1,31 @@
 // al rato la hago
 import { FormEvent, useState } from "react";
-
+import { Link, useNavigate } from "react-router-dom";
+import { Check, Home, Lock, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+ 
+
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Input } from "@/components/ui/input";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { UserRole } from "@/lib/auth";
+
+type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
+
+const BENEFITS = [
+  "🔥💨 One powerful login for everything — payments, maintenance requests, and communication all in one place",
+  "🔥💨 Smart role-aware dashboards built specifically for tenants and landlords",
+  "🔥💨 Safe sandbox mode — fully isolated, with a simple mocked CRUD login for worry-free testing",
+];
+//Smoke porque el CEO es vende humo
 
 export function RegisterPage() {
   const [name, setName] = useState("");
