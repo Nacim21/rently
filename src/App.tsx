@@ -10,19 +10,16 @@ import PaymentsPage from "./pages/Payments/PaymentsPage";
 import MessagesPage from "./pages/messages/MessagesPage";
 import { useAuth } from "./lib/auth";
 import type { JSX } from "react";
+import MaintenancePage from "./pages/Maintenance/MaintenancePage";
 
 
 // 
 // TODO: import these when you build them:
-// import MaintenancePage from "./pages/Maintenance/Maintenance";
 // import PropertiesPage from "./pages/Properties/PropertiesPage";
 
 // TEMPORARY placeholders  
 function PropertiesPlaceholder() {
   return <div>Properties content</div>;
-}
-function MaintanencePlaceholder() {
-  return <div>Maintanence Placeholder</div>;
 }
 
 // These are placeholder components for the respective pages. In the final implementation, they would be imported from their respective files.
@@ -77,9 +74,8 @@ export default function App() {
         <Route path="dashboard" element={<DashboardPage/>} />
         <Route path="properties" element={<PropertiesPlaceholder />} />
         <Route path="payments" element={<PaymentsPage />} />
-        <Route path="maintenance" element={<MaintanencePlaceholder />} />
-        <Route path="messages" element={<MessagesPage />} />
-
+        <Route path="maintenance" element={<MaintenancePage/>} />
+        <Route path="messages" element={<MessagesPage/>} />
       </Route>
 
       {/* fallback if someone goes to unknown route just send home */}
