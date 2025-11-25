@@ -1,15 +1,10 @@
-// src\pages\Auth\RegisterPage.tsx
-import type { FormEvent } from "react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Check, Home, Lock, UserPlus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
- 
-
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { Input } from "@/components/ui/input";
-
 import {
   Select,
   SelectContent,
@@ -17,45 +12,51 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth";
 
 type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
 
 const BENEFITS = [
-  "🔥💨 One powerful login for everything — payments, maintenance requests, and communication all in one place",
-  "🔥💨 Smart role-aware dashboards built specifically for tenants and landlords",
-  "🔥💨 Safe sandbox mode — fully isolated, with a simple mocked CRUD login for worry-free testing",
+  "One login for payments, maintenance, and messages",
+  "Role-aware dashboards for tenants and landlords",
+  "Safe sandbox: we only mock a simple CRUD login",
 ];
-//Smoke porque el CEO es vende humo
+
 export function RegisterPage() {
- 
+  const navigate = useNavigate();
+  const { registerUser } = useAuth();
   const [role, setRole] = useState<FormRole>("Tenant");
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [company, setCompany] = useState("");
-   
-  const onSubmit = (event: FormEvent) => {
- 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    // pretend we hit the backend here; for now just log the payload
-    console.log("register payload", {
-      role,
-      fullName,
-      email,
-      password,
-      company,
-    });
+    setError(null);
+    setIsSubmitting(true);
+
+    const result = await registerUser(fullName, password, role);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      navigate("/auth/login", { replace: true });
+      return;
+    }
+
+    setError(result.message ?? "Unable to register. Please try again.");
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <header className="border-b border-slate-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Home className="h-6 w-6 text-slate-900" />
-            <span className="text-xl font-semibold text-slate-900">Rently</span>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+      <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-8">
+        <header className="flex items-center justify-between py-4">
+          <div className="flex items-center gap-2 text-slate-900">
+            <Home className="h-5 w-5 text-sky-600" />
+            <span className="text-base font-semibold">Rently</span>
           </div>
+
           <div className="flex items-center gap-3 text-sm">
             <Button variant="ghost" size="sm" asChild>
               <Link to="/auth/login">Login</Link>
@@ -64,10 +65,9 @@ export function RegisterPage() {
               <Link to="/">Back to app</Link>
             </Button>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="grid flex-1 grid-cols-1 gap-8 lg:grid-cols-2 lg:items-center px-6 py-12">
+        <main className="grid flex-1 grid-cols-1 gap-8 lg:grid-cols-2 lg:items-center">
           <section className="space-y-6 text-left">
             <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100">
               <UserPlus className="h-4 w-4" />
@@ -79,8 +79,8 @@ export function RegisterPage() {
                 Register for your Rently account
               </h1>
               <p className="max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
-                This is a mock registration for our CRUD-only demo. We just need a few details to spin up your sandbox. Passwords
-                are plain strings coming from the backend, so no auth headaches here.
+                This is a mock registration for our CRUD-only demo. Your details go straight to the demo API and we send you
+                back to login—no real auth or emails involved.
               </p>
             </div>
 
@@ -134,17 +134,6 @@ export function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Email</label>
-                    <Input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Password</label>
                     <Input
                       type="password"
@@ -155,20 +144,16 @@ export function RegisterPage() {
                       required
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Company / Property name</label>
-                    <Input
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      placeholder="Optional"
-                    />
-                  </div>
                 </CardContent>
 
                 <CardFooter className="flex flex-col gap-3">
-                  <Button type="submit" className="w-full">
-                    Create account
+                  {error && (
+                    <p className="text-sm font-medium text-red-600" role="alert">
+                      {error}
+                    </p>
+                  )}
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Creating..." : "Create account"}
                   </Button>
                   <p className="text-center text-xs text-slate-500">
                     Already have an account? {" "}
@@ -182,5 +167,6 @@ export function RegisterPage() {
           </section>
         </main>
       </div>
+    </div>
   );
 }
