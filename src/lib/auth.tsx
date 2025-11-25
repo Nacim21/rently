@@ -26,11 +26,11 @@ export type AuthResult = {
   message?: string;
 };
 
-type RegisterFn = {
-  (name: string, password: string, role: UserRole): AuthResult;
-  // kept for backwards compatibility with older screens that only pass name + role
-  (name: string, role: UserRole): AuthResult;
-};
+type RegisterFn = (
+  name: string,
+  password: string,
+  role: UserRole
+) => Promise<AuthResult>;
 
 type LoginFn = {
   (name: string, password: string, role: UserRole): AuthResult;
