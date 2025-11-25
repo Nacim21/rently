@@ -6,8 +6,20 @@ export type User = {
   id: number;
   name: string;
   role: UserRole;
-  password: string; // Just for the prototype, DO NOT RAGE xd
+  password: string; // Plain text only for prototype parity with backend
 };
+
+//NEW TYPE API ROL
+type ApiRole = "TENANT" | "LANDLORD";
+
+type ApiUser = {
+  id: number;
+  name: string;
+  password: string;
+  role: ApiRole;
+};
+
+
 
 export type AuthResult = {
   success: boolean;
