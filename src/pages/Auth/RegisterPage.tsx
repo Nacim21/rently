@@ -36,7 +36,7 @@ export function RegisterPage() {
   const [company, setCompany] = useState("");
    
   const onSubmit = (event: FormEvent) => {
-  const onSubmit = (event: FormEvent) => {
+ 
     event.preventDefault();
     // pretend we hit the backend here; for now just log the payload
     console.log("register payload", {
