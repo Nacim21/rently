@@ -93,12 +93,12 @@ export function LoginPage() {
     setIsSubmitting(false);
   };
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!formRole) return;
 
     setIsSubmitting(true);
-    const result = login(username, password, formRole);
+    const result = await login(username, password, formRole);
     setIsSubmitting(false);
 
     if (result.success) {
