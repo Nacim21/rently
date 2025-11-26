@@ -295,6 +295,21 @@ export function LoginPage() {
             </div>
           </section>
 
+          {/* quick register section */}
+          <section className="pb-8">
+            <div className="mx-auto max-w-3xl rounded-lg bg-white p-6 text-center shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900">New to Rently</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Create an account and get access to payments maintenance and messages
+              </p>
+              <div className="mt-4 flex justify-center">
+                <Button size="md" onClick={() => navigate("/auth/register")} className="px-6">
+                  Create account
+                </Button>
+              </div>
+            </div>
+          </section>
+
           {/* big CTA block */}
           <section className="mt-auto pb-10">
             <div className="mx-auto max-w-3xl rounded-2xl bg-sky-600 px-6 py-10 text-center text-slate-50 shadow-md">
