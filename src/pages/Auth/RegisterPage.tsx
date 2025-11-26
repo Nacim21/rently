@@ -30,10 +30,14 @@ import landlordLogo from "../../assets/register/landlord-logo.png";
 type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
 
 const BENEFITS = [
-  "One login for payments, maintenance, and messages",
-  "Role-aware dashboards for tenants and landlords",
-  "Safe sandbox: we only mock a simple CRUD login",
+  " Instant onboarding: register, log in, and start managing your property or rental in under 60 seconds",
+  " Centralized hub: payments, maintenance requests, and messaging all live in one clean interface",
+  " Real-time communication: faster responses between tenants and landlords with built-in notifications",
+  " Zero-risk sandbox: safe environment to test flows without touching real data",
+  " Smart, role-aware dashboards designed specifically for landlords and tenants — no clutter, no confusion",
+  " Visual polish powered by Shadcn + Tailwind for a premium app experience",
 ];
+
 
 const glassGridImageModules = import.meta.glob<string>(
   "../../assets/register/glassgrid/*.{png,jpg,jpeg,webp}",
