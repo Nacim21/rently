@@ -5,6 +5,14 @@
 - npm run dev
 
 
+> Note: Keep the Django server running in another terminal. Open another terminal 
+>
+> ```bash
+> # in terminal B (keep running)
+> python manage.py runserver
+ 
+
+
 # Rently Frontend Guide (React + shadcn/ui + tailwind)
 
 A beginner-friendly development guide for the Rently frontend.  

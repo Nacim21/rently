@@ -4,7 +4,7 @@ import { Lock, X, Home } from "lucide-react";
 import tenantImg from "@/assets/auth/login-tenant.png";
 import landlordImg from "@/assets/auth/login-landlord.png";
 
-
+// small ui bits we reuse from the component lib
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth";
 
+// small list of features shown on landing
+// just static data for the grid below
 const FEATURES = [
   {
     title: "Rent Tracking",
@@ -51,18 +53,23 @@ const FEATURES = [
   },
 ];
 
+// type narrowing so we only allow Tenant or Landlord here
 type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
 
 export function LoginPage() {
+  // router helper to move around
   const navigate = useNavigate();
+  // auth hook gives current user and login fn
   const { currentUser, login } = useAuth(); // we also grab currentUser so we can block this page when already logged in
 
+  // local ui state
   const [formRole, setFormRole] = useState<FormRole | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // so we can focus the username field when overlay opens
   const usernameInputRef = useRef<HTMLInputElement | null>(null);
 
   // focus username when the overlay opens
@@ -72,12 +79,13 @@ export function LoginPage() {
     }
   }, [formRole]);
 
-  // if a user is already logged in we dont want them to see the public auth / landing again
-  // they go straight to the dashboard instead
+  // if a user is already logged in we dont want them to see this page
+  // send them to dashboard instead
   if (currentUser) {
     return <Navigate to="/dashboard" replace />;
   }
 
+  // open login overlay for chosen role
   const openForm = (role: FormRole) => {
     setFormRole(role);
     setUsername("");
@@ -85,6 +93,7 @@ export function LoginPage() {
     setError(null);
   };
 
+  // close and reset overlay
   const closeForm = () => {
     setFormRole(null);
     setUsername("");
@@ -93,12 +102,13 @@ export function LoginPage() {
     setIsSubmitting(false);
   };
 
-  const handleSubmit = (event: FormEvent) => {
+  // submit handler talk to auth hook
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!formRole) return;
 
     setIsSubmitting(true);
-    const result = login(username, password, formRole);
+    const result = await login(username, password, formRole);
     setIsSubmitting(false);
 
     if (result.success) {
@@ -106,9 +116,11 @@ export function LoginPage() {
       return;
     }
 
+    // show server or validation message
     setError(result.message ?? "Unable to login");
   };
 
+  // hero subtitle as variable to keep JSX cleaner
   const heroSubtitle =
     "Streamline rent collection, track maintenance, and communicate seamlessly. Built for tenants, landlords, and property managers.";
 
@@ -116,6 +128,7 @@ export function LoginPage() {
     <div className="relative min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       {/* Login overlay */}
       {formRole && (
+        // overlay covers whole screen when login form is open
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <Card className="w-full max-w-md shadow-xl animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-200">
             <CardHeader className="flex flex-row items-start justify-between space-y-0">
@@ -144,13 +157,12 @@ export function LoginPage() {
               <CardContent className="space-y-4">
                 {/* simple image placeholder per login type */}
                 <div className="flex h-24 w-full items-center justify-center mb-2">
-                    <img
-                        src={formRole === "Tenant" ? tenantImg : landlordImg}
-                        alt={`${formRole} login`}
-                        className="h-full rounded-md object-contain"
-                    />
-                    </div>
-
+                  <img
+                    src={formRole === "Tenant" ? tenantImg : landlordImg}
+                    alt={`${formRole} login`}
+                    className="h-full rounded-md object-contain"
+                  />
+                </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">
@@ -179,6 +191,7 @@ export function LoginPage() {
                 </div>
 
                 {error && (
+                  // simple inline error message
                   <p className="text-sm font-medium text-red-600">{error}</p>
                 )}
               </CardContent>
@@ -217,6 +230,7 @@ export function LoginPage() {
           </div>
 
           <div className="flex items-center gap-3 text-sm">
+            {/* top buttons open the login overlay */}
             <Button
               variant="ghost"
               size="sm"
@@ -278,6 +292,21 @@ export function LoginPage() {
                   </p>
                 </div>
               ))}
+            </div>
+          </section>
+
+          {/* quick register section */}
+          <section className="pb-8">
+            <div className="mx-auto max-w-3xl rounded-lg bg-white p-6 text-center shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900">New to Rently</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Create an account and get access to payments maintenance and messages
+              </p>
+              <div className="mt-4 flex justify-center">
+                <Button size="md" onClick={() => navigate("/auth/register")} className="px-6">
+                  Create account
+                </Button>
+              </div>
             </div>
           </section>
 

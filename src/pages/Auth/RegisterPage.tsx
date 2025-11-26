@@ -1,45 +1,258 @@
-// al rato la hago
 import { FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Check, Home, Lock, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAuth } from "@/lib/auth";
+import type { UserRole } from "@/lib/auth";
+
+import { GlassGrid } from "@/components/GlassGrid";
+
+import tenantLogo from "../../assets/register/tenant-logo.png";
+import landlordLogo from "../../assets/register/landlord-logo.png";
+
+type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
+
+const BENEFITS = [
+  " Instant onboarding: register, log in, and start managing your property or rental in under 60 seconds",
+  " Centralized hub: payments, maintenance requests, and messaging all live in one clean interface",
+  " Real-time communication: faster responses between tenants and landlords with built-in notifications",
+  " Zero-risk sandbox: safe environment to test flows without touching real data",
+  " Smart, role-aware dashboards designed specifically for landlords and tenants — no clutter, no confusion",
+  " Visual polish powered by Shadcn + Tailwind for a premium app experience",
+];
+
+
+const glassGridImageModules = import.meta.glob<string>(
+  "../../assets/register/glassgrid/*.{png,jpg,jpeg,webp}",
+  {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }
+);
+
+const GLASSGRID_IMAGES = Object.entries(glassGridImageModules).map(
+  ([path, url]) => {
+    const fileName = path.split("/").pop() ?? "";
+    const label = fileName
+      .replace(/\.[^/.]+$/, "")
+      .replace(/[-_]/g, " ");
+
+    return {
+      src: url as string,
+      label,
+    };
+  }
+);
 
 export function RegisterPage() {
-  const [name, setName] = useState("");
+  const navigate = useNavigate();
+  const { registerUser } = useAuth();
+  const [role, setRole] = useState<FormRole>("Tenant");
+  const [fullName, setFullName] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // this is the most basic submit handler, no auth yet
-  const onSubmit = (event: FormEvent) => {
+  const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    console.log("trying to register user:", name); // later we call registerUser
+    setError(null);
+    setIsSubmitting(true);
+
+    const result = await registerUser(fullName, password, role);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      navigate("/auth/login", { replace: true });
+      return;
+    }
+
+    setError(result.message ?? "Unable to register. Please try again.");
   };
 
+  const logoSrc = role === "Tenant" ? tenantLogo : landlordLogo;
+
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Create Account (v1 minimal)</CardTitle>
-        </CardHeader>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+      <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-8">
+        <header className="flex items-center justify-between py-4">
+          <div className="flex items-center gap-2 text-slate-900">
+            <Home className="h-5 w-5 text-sky-600" />
+            <span className="text-base font-semibold">Rently</span>
+          </div>
 
-        <form onSubmit={onSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Name</label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ex. Maria Lopez"
-              />
-            </div>
-          </CardContent>
-
-          <CardFooter>
-            <Button type="submit" className="w-full">
-              Create
+          <div className="flex items-center gap-3 text-sm">
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/auth/login">Login</Link>
             </Button>
-          </CardFooter>
-        </form>
-      </Card>
+            <Button size="sm" asChild>
+              <Link to="/">Back to app</Link>
+            </Button>
+          </div>
+        </header>
+
+        <main className="grid flex-1 grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
+          {/* Left column */}
+          <section className="space-y-7 text-left">
+            <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100">
+              <UserPlus className="h-4 w-4" />
+              Create your workspace access
+            </div>
+
+            <div className="space-y-4">
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                Register for your Rently account
+              </h1>
+              <p className="max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
+                This is a mock registration for our CRUD-only demo. Your details go
+                straight to the demo API and we send you back to login—no real auth or
+                emails involved.
+              </p>
+            </div>
+
+            <ul className="space-y-3 text-sm text-slate-700">
+              {BENEFITS.map((benefit) => (
+                <li key={benefit} className="flex items-start gap-2">
+                  <span className="mt-0.5 rounded-full bg-emerald-100 p-1 text-emerald-600">
+                    <Check className="h-4 w-4" />
+                  </span>
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-2 rounded-[32px] bg-sky-50/60 p-4 sm:p-6 shadow-sm ring-1 ring-sky-100/70">
+              <GlassGrid images={GLASSGRID_IMAGES} />
+            </div>
+          </section>
+
+          {/* Right column */}
+          <section>
+            <Card className="w-full shadow-lg backdrop-blur-sm">
+              <CardHeader className="space-y-1">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Lock className="h-5 w-5 text-slate-600" />
+                  Create account
+                </CardTitle>
+                <CardDescription className="text-sm text-slate-600">
+                  Pick your role, add your info, and we will hand you back to the login
+                  screen.
+                </CardDescription>
+              </CardHeader>
+
+              <form onSubmit={onSubmit}>
+                <CardContent className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Role</label>
+                    <Select
+                      value={role}
+                      onValueChange={(value) => setRole(value as FormRole)}
+                    >
+                      <SelectTrigger
+                        className="
+                          w-full
+                          border border-slate-900/80
+                          bg-slate-950/90
+                          text-slate-50
+                          placeholder:text-slate-300
+                          data-[placeholder]:text-slate-300
+                          hover:bg-slate-900
+                          focus:ring-0
+                          focus-visible:ring-2
+                          focus-visible:ring-slate-900/70
+                        "
+                      >
+                        <SelectValue placeholder="Select your role" />
+                      </SelectTrigger>
+                      <SelectContent className="border border-slate-800 bg-slate-950 text-slate-50">
+                        <SelectItem value="Tenant">Tenant</SelectItem>
+                        <SelectItem value="Landlord">Landlord</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Full name
+                    </label>
+                    <Input
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Ex. Maria Lopez"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">
+                      Password
+                    </label>
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Plain string from backend"
+                      autoComplete="new-password"
+                      required
+                    />
+                  </div>
+
+                  {/* Bigger logo */}
+                  <div className="pt-4 flex justify-center">
+                    <div className="inline-flex flex-col items-center justify-center rounded-3xl border border-slate-200/80 bg-slate-50/80 px-7 py-6 shadow-sm">
+                      <img
+                        src={logoSrc}
+                        alt={role === "Tenant" ? "Tenant logo" : "Landlord logo"}
+                        className="h-32 w-32 sm:h-36 sm:w-36 object-contain"
+                      />
+                      <span className="mt-2 text-xs font-medium text-slate-700">
+                        {role === "Tenant" ? "Tenant experience" : "Landlord experience"}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+
+                <CardFooter className="flex flex-col gap-3">
+                  {error && (
+                    <p className="text-sm font-medium text-red-600" role="alert">
+                      {error}
+                    </p>
+                  )}
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Creating..." : "Create account"}
+                  </Button>
+                  <p className="text-center text-xs text-slate-500">
+                    Already have an account?{" "}
+                    <Link
+                      to="/auth/login"
+                      className="text-sky-600 hover:text-sky-700"
+                    >
+                      Go to login
+                    </Link>
+                  </p>
+                </CardFooter>
+              </form>
+            </Card>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
