@@ -11,17 +11,9 @@ import MessagesPage from "./pages/messages/MessagesPage";
 import { useAuth } from "./lib/auth";
 import type { JSX } from "react";
 import MaintenancePage from "./pages/Maintenance/MaintenancePage";
+import PropertiesPage from "./pages/Properties/PropertiesPage";
 
-
-// 
-// TODO: import these when you build them:
-// import PropertiesPage from "./pages/Properties/PropertiesPage";
-
-// TEMPORARY placeholders  
-function PropertiesPlaceholder() {
-  return <div>Properties content</div>;
-}
-
+ 
 // These are placeholder components for the respective pages. In the final implementation, they would be imported from their respective files.
 
 
@@ -72,7 +64,7 @@ export default function App() {
 
         {/* nested pages below here must not start with slash or router freaks out */}
         <Route path="dashboard" element={<DashboardPage/>} />
-        <Route path="properties" element={<PropertiesPlaceholder />} />
+        <Route path="properties" element={<PropertiesPage />} />
         <Route path="payments" element={<PaymentsPage />} />
         <Route path="maintenance" element={<MaintenancePage/>} />
         <Route path="messages" element={<MessagesPage/>} />
