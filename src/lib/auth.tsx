@@ -56,11 +56,12 @@ const API_BASE_URL =
 
 const normalizedApiBase = API_BASE_URL.replace(/\/$/, "");
 
+console.info(`[Auth] Using API base URL: ${normalizedApiBase}`);
+
 const API_ENDPOINTS = {
   listUsers: `${normalizedApiBase}/api/users/`,
   createUser: `${normalizedApiBase}/api/users/create/`,
 };
-
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function readStorage<T>(key: string): T | null {
