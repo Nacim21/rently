@@ -22,8 +22,12 @@ import {
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth";
 
-// imports for GlassGrid. Nacim do not get mad, it looks so cool
+// GlassGrid
 import { GlassGrid } from "@/components/GlassGrid";
+
+// Role logos
+import tenantLogo from "../../assets/register/tenant-logo.png";
+import landlordLogo from "../../assets/register/landlord-logo.png";
 
 type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
 
@@ -33,9 +37,9 @@ const BENEFITS = [
   "Safe sandbox: we only mock a simple CRUD login",
 ];
 
-// 🔧 Vite glob import with the new `query` + `import` options
-const registerImageModules = import.meta.glob<string>(
-  "../../assets/register/*.{png,jpg,jpeg,webp}",
+// GlassGrid images: src/assets/register/glassgrid/*
+const glassGridImageModules = import.meta.glob<string>(
+  "../../assets/register/glassgrid/*.{png,jpg,jpeg,webp}",
   {
     eager: true,
     query: "?url",
@@ -43,8 +47,7 @@ const registerImageModules = import.meta.glob<string>(
   }
 );
 
-// Build the array for GlassGrid
-const REGISTER_IMAGES = Object.entries(registerImageModules).map(
+const GLASSGRID_IMAGES = Object.entries(glassGridImageModules).map(
   ([path, url]) => {
     const fileName = path.split("/").pop() ?? "";
     const label = fileName
@@ -83,6 +86,8 @@ export function RegisterPage() {
     setError(result.message ?? "Unable to register. Please try again.");
   };
 
+  const logoSrc = role === "Tenant" ? tenantLogo : landlordLogo;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-8">
@@ -102,8 +107,9 @@ export function RegisterPage() {
           </div>
         </header>
 
-        <main className="grid flex-1 grid-cols-1 gap-8 lg:grid-cols-2 lg:items-center">
-          <section className="space-y-6 text-left">
+        <main className="grid flex-1 grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
+          {/* Left: copy + gallery */}
+          <section className="space-y-7 text-left">
             <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100">
               <UserPlus className="h-4 w-4" />
               Create your workspace access
@@ -114,8 +120,8 @@ export function RegisterPage() {
                 Register for your Rently account
               </h1>
               <p className="max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
-                This is a mock registration for our CRUD-only demo. Your details go straight to the demo API and we send you
-                back to login—no real auth or emails involved.
+                This is a mock registration for our CRUD-only demo. Your details go straight
+                to the demo API and we send you back to login—no real auth or emails involved.
               </p>
             </div>
 
@@ -130,26 +136,28 @@ export function RegisterPage() {
               ))}
             </ul>
 
-            {/* glassmorphic grid with all images in src/assets/register */}
-            <div className="mt-4 rounded-3xl bg-sky-50/40 p-2 sm:p-3">
-              <GlassGrid images={REGISTER_IMAGES} />
+            {/* Larger glassmorphic gallery */}
+            <div className="mt-2 rounded-[32px] bg-sky-50/60 p-4 sm:p-6 shadow-sm ring-1 ring-sky-100/70">
+              <GlassGrid images={GLASSGRID_IMAGES} />
             </div>
           </section>
 
+          {/* Right: form + role logo */}
           <section>
-            <Card className="w-full shadow-lg">
+            <Card className="w-full shadow-lg backdrop-blur-sm">
               <CardHeader className="space-y-1">
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <Lock className="h-5 w-5 text-slate-600" />
                   Create account
                 </CardTitle>
                 <CardDescription className="text-sm text-slate-600">
-                  Pick your role, add your info, and we will hand you back to the login screen.
+                  Pick your role, add your info, and we will hand you back to the login
+                  screen.
                 </CardDescription>
               </CardHeader>
 
               <form onSubmit={onSubmit}>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-5">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Role</label>
                     <Select
@@ -190,6 +198,17 @@ export function RegisterPage() {
                       autoComplete="new-password"
                       required
                     />
+                  </div>
+
+                  {/* Role-specific logo under fields */}
+                  <div className="pt-2 flex justify-center">
+                    <div className="inline-flex items-center justify-center rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 shadow-sm">
+                      <img
+                        src={logoSrc}
+                        alt={role === "Tenant" ? "Tenant logo" : "Landlord logo"}
+                        className="h-16 w-auto object-contain"
+                      />
+                    </div>
                   </div>
                 </CardContent>
 
