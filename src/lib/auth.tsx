@@ -9,7 +9,6 @@ export type User = {
   password: string; // Plain text only for prototype parity with backend
 };
 
-//NEW TYPE API ROL
 type ApiRole = "TENANT" | "LANDLORD";
 
 type ApiUser = {
@@ -18,8 +17,6 @@ type ApiUser = {
   password: string;
   role: ApiRole;
 };
-
-
 
 export type AuthResult = {
   success: boolean;
@@ -38,7 +35,6 @@ type LoginFn = (
   role: UserRole
 ) => Promise<AuthResult>;
 
-
 type AuthContextValue = {
   currentUser: User | null;
   registerUser: RegisterFn;
@@ -54,13 +50,19 @@ const COOKIE_KEYS = {
   currentUser: "rently_current_user",
 };
 
- const API_ENDPOINTS = {
-  listUsers: "/api/users/",
-  createUser: "/api/users/create/",
+const API_BASE_URL =
+  (import.meta as unknown as { env?: { VITE_API_BASE_URL?: string } })?.env
+    ?.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
+
+const normalizedApiBase = API_BASE_URL.replace(/\/$/, "");
+
+const API_ENDPOINTS = {
+  listUsers: `${normalizedApiBase}/api/users/`,
+  createUser: `${normalizedApiBase}/api/users/create/`,
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-// tiny util that gets stuff from local storage and parses it
+
 function readStorage<T>(key: string): T | null {
   if (typeof window === "undefined") return null;
   const stored = window.localStorage.getItem(key);
@@ -75,28 +77,22 @@ function readStorage<T>(key: string): T | null {
   }
 }
 
-// helper to sync current user into a cookie so other parts can read it
 function setCurrentUserCookie(user: User | null) {
-  // same deal if there is no document we just skip
   if (typeof document === "undefined") return;
 
   if (!user) {
-    // clear cookie when user logs out or is missing
     document.cookie = `${COOKIE_KEYS.currentUser}=; Max-Age=0; path=/`;
     return;
   }
 
-  // build a tiny payload with user info no password only basic stuff
   const payload = JSON.stringify({
     id: user.id,
     name: user.name,
     role: user.role,
   });
 
-  // cookie lives for seven days feels ok for a demo app
   const maxAgeSeconds = 7 * 24 * 60 * 60; // 7 days
 
-  // stash user info in cookie so next page loads can read it
   document.cookie = `${COOKIE_KEYS.currentUser}=${encodeURIComponent(
     payload
   )}; Max-Age=${maxAgeSeconds}; path=/`;
@@ -267,8 +263,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-
-   export const useAuth = () => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
