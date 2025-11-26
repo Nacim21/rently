@@ -1,9 +1,11 @@
+import { useState, useRef, type MouseEvent } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion, useMotionValue, useTransform } from "framer-motion";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 type GlassGridImage = {
   src: string;
-  alt?: string;
   label?: string;
 };
 
@@ -11,34 +13,102 @@ interface GlassGridProps {
   images: GlassGridImage[];
 }
 
+
+ //overlapping glass cards row.
+  //hover will highlight card moves up and forward.
+  //click opens larger preview dialog.
+ 
 export function GlassGrid({ images }: GlassGridProps) {
+  const [activeImage, setActiveImage] = useState<GlassGridImage | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  if (!images?.length) return null;
+
+  const scroll = (direction: "left" | "right") => {
+    if (!scrollRef.current) return;
+    const amount = direction === "left" ? -240 : 240;
+    scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
+  };
+
   return (
-    <section className="w-full px-6 py-10">
-      <div
-        className="
-          grid gap-6
-          grid-cols-2
-          sm:grid-cols-3
-          lg:grid-cols-4
-          xl:grid-cols-5
-        "
-      >
-        {images.map((image, index) => (
-          <GlassCard key={image.src ?? index} image={image} />
-        ))}
+    <>
+      {/* z-20 para no quedar detrás del card de create account , porfa no le quiten esto o se va ir a la porra todo*/}
+      <div className="relative z-20 mr-auto max-w-lg">
+        {/* carrusel horizontal scrollable, we can change it for another dynamic if you want guys, let me know */}
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto pb-2 pr-4"
+        >
+          {images.map((image, index) => (
+            <GlassCard
+              key={`${image.src}-${index}`}
+              image={image}
+              index={index}
+              onClick={() => setActiveImage(image)}
+            />
+          ))}
+        </div>
+
+        {/* Flechas de navegación */}
+        <div className="mt-2 flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 rounded-full border-slate-300 bg-white/80 text-slate-700 hover:bg-white"
+            onClick={() => scroll("left")}
+          >
+            ‹
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 rounded-full border-slate-300 bg-white/80 text-slate-700 hover:bg-white"
+            onClick={() => scroll("right")}
+          >
+            ›
+          </Button>
+        </div>
       </div>
-    </section>
+
+      {/* Modal con imagen grande, SIN nombre */}
+      <Dialog
+        open={!!activeImage}
+        onOpenChange={(open) => !open && setActiveImage(null)}
+      >
+        <DialogContent className="max-w-xl border border-white/20 bg-white/70 backdrop-blur-2xl">
+          {activeImage && (
+            <div className="flex justify-center">
+              <img
+                src={activeImage.src}
+                alt="Preview"
+                className="max-h-[420px] w-auto rounded-3xl bg-slate-100 object-contain"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
-function GlassCard({ image }: { image: GlassGridImage }) {
+function GlassCard({
+  image,
+  index,
+  onClick,
+}: {
+  image: GlassGridImage;
+  index: number;
+  onClick: () => void;
+}) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
   const rotateX = useTransform(y, [-0.5, 0.5], [8, -8]);
   const rotateY = useTransform(x, [-0.5, 0.5], [-8, 8]);
 
-  const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
+  const handleMouseMove = (event: MouseEvent<HTMLButtonElement>) => {
     const card = event.currentTarget.getBoundingClientRect();
     const relativeX = (event.clientX - card.left) / card.width - 0.5;
     const relativeY = (event.clientY - card.top) / card.height - 0.5;
@@ -53,63 +123,56 @@ function GlassCard({ image }: { image: GlassGridImage }) {
   };
 
   return (
-    <motion.div
-      className="group"
+    <motion.button
+      type="button"
+      className={`group relative flex-shrink-0 focus:outline-none ${
+        index !== 0 ? "-ml-10" : ""
+      }`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={onClick}
       style={{
         rotateX,
         rotateY,
         transformPerspective: 900,
       }}
       whileHover={{
-        scale: 1.04,
+        scale: 1.08,
+        translateY: -10,
+        zIndex: 20,
       }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 200, damping: 18 }}
+      transition={{ type: "spring", stiffness: 220, damping: 18 }}
     >
       <Card
         className="
-          relative overflow-hidden
-          rounded-2xl border border-white/30
-          bg-white/20
+          h-56 w-36
+          sm:h-64 sm:w-44
+          rounded-3xl border border-white/30
+          bg-white/25
           shadow-lg shadow-sky-100/40
           backdrop-blur-xl
           transition-all duration-300
           group-hover:shadow-xl
-          group-hover:bg-white/30
+          group-hover:bg-white/35
         "
       >
-        <CardContent className="p-3">
-          <div className="relative overflow-hidden rounded-xl">
+        <CardContent className="flex h-full w-full items-center justify-center p-3">
+          <div className="h-full w-full overflow-hidden rounded-[1.8rem]">
             <img
               src={image.src}
-              alt={image.alt ?? "Rently preview"}
+              alt="Preview"
               className="
-                h-40 w-full object-cover
+                h-full w-full
+                rounded-[1.8rem]
+                object-contain
+                bg-slate-100/70
                 transition duration-300
                 group-hover:brightness-110 group-hover:contrast-105
               "
             />
-
-            {image.label && (
-              <div
-                className="
-                  pointer-events-none
-                  absolute inset-x-3 bottom-3
-                  flex items-center justify-between
-                  rounded-full border border-white/40
-                  bg-white/30 px-3 py-1
-                  text-xs font-medium text-slate-800
-                  backdrop-blur-md shadow-sm
-                "
-              >
-                <span className="truncate">{image.label}</span>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </motion.button>
   );
 }

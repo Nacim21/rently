@@ -22,10 +22,8 @@ import {
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth";
 
-// GlassGrid
 import { GlassGrid } from "@/components/GlassGrid";
 
-// Role logos
 import tenantLogo from "../../assets/register/tenant-logo.png";
 import landlordLogo from "../../assets/register/landlord-logo.png";
 
@@ -37,7 +35,6 @@ const BENEFITS = [
   "Safe sandbox: we only mock a simple CRUD login",
 ];
 
-// GlassGrid images: src/assets/register/glassgrid/*
 const glassGridImageModules = import.meta.glob<string>(
   "../../assets/register/glassgrid/*.{png,jpg,jpeg,webp}",
   {
@@ -51,8 +48,8 @@ const GLASSGRID_IMAGES = Object.entries(glassGridImageModules).map(
   ([path, url]) => {
     const fileName = path.split("/").pop() ?? "";
     const label = fileName
-      .replace(/\.[^/.]+$/, "") // remove extension
-      .replace(/[-_]/g, " "); // nicer label
+      .replace(/\.[^/.]+$/, "")
+      .replace(/[-_]/g, " ");
 
     return {
       src: url as string,
@@ -108,7 +105,7 @@ export function RegisterPage() {
         </header>
 
         <main className="grid flex-1 grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-          {/* Left: copy + gallery */}
+          {/* Left column */}
           <section className="space-y-7 text-left">
             <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100">
               <UserPlus className="h-4 w-4" />
@@ -120,8 +117,9 @@ export function RegisterPage() {
                 Register for your Rently account
               </h1>
               <p className="max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
-                This is a mock registration for our CRUD-only demo. Your details go straight
-                to the demo API and we send you back to login—no real auth or emails involved.
+                This is a mock registration for our CRUD-only demo. Your details go
+                straight to the demo API and we send you back to login—no real auth or
+                emails involved.
               </p>
             </div>
 
@@ -136,13 +134,12 @@ export function RegisterPage() {
               ))}
             </ul>
 
-            {/* Larger glassmorphic gallery */}
             <div className="mt-2 rounded-[32px] bg-sky-50/60 p-4 sm:p-6 shadow-sm ring-1 ring-sky-100/70">
               <GlassGrid images={GLASSGRID_IMAGES} />
             </div>
           </section>
 
-          {/* Right: form + role logo */}
+          {/* Right column */}
           <section>
             <Card className="w-full shadow-lg backdrop-blur-sm">
               <CardHeader className="space-y-1">
@@ -164,10 +161,23 @@ export function RegisterPage() {
                       value={role}
                       onValueChange={(value) => setRole(value as FormRole)}
                     >
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger
+                        className="
+                          w-full
+                          border border-slate-900/80
+                          bg-slate-950/90
+                          text-slate-50
+                          placeholder:text-slate-300
+                          data-[placeholder]:text-slate-300
+                          hover:bg-slate-900
+                          focus:ring-0
+                          focus-visible:ring-2
+                          focus-visible:ring-slate-900/70
+                        "
+                      >
                         <SelectValue placeholder="Select your role" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="border border-slate-800 bg-slate-950 text-slate-50">
                         <SelectItem value="Tenant">Tenant</SelectItem>
                         <SelectItem value="Landlord">Landlord</SelectItem>
                       </SelectContent>
@@ -200,14 +210,17 @@ export function RegisterPage() {
                     />
                   </div>
 
-                  {/* Role-specific logo under fields */}
-                  <div className="pt-2 flex justify-center">
-                    <div className="inline-flex items-center justify-center rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 shadow-sm">
+                  {/* Bigger logo */}
+                  <div className="pt-4 flex justify-center">
+                    <div className="inline-flex flex-col items-center justify-center rounded-3xl border border-slate-200/80 bg-slate-50/80 px-7 py-6 shadow-sm">
                       <img
                         src={logoSrc}
                         alt={role === "Tenant" ? "Tenant logo" : "Landlord logo"}
-                        className="h-16 w-auto object-contain"
+                        className="h-32 w-32 sm:h-36 sm:w-36 object-contain"
                       />
+                      <span className="mt-2 text-xs font-medium text-slate-700">
+                        {role === "Tenant" ? "Tenant experience" : "Landlord experience"}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
