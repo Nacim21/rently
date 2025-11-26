@@ -148,6 +148,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
+      console.info("[Auth] Registering user via", API_ENDPOINTS.createUser);
+
       const response = await fetch(API_ENDPOINTS.createUser, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -168,6 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         };
       }
 
+      console.info("[Auth] Register response status:", response.status);
       return { success: true };
     } catch (error) {
       console.error("Failed to register user", error);
@@ -177,6 +180,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       };
     }
   };
+
 
   const login: LoginFn = async (
     name: string,
@@ -195,6 +199,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
+      console.info("[Auth] Fetching users from", API_ENDPOINTS.listUsers);
+
       const response = await fetch(API_ENDPOINTS.listUsers);
 
       if (!response.ok) {
@@ -204,6 +210,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         };
       }
 
+      console.info("[Auth] User list response status:", response.status);
       const body = (await response.json()) as unknown;
 
       if (!Array.isArray(body)) {
@@ -244,6 +251,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       };
     }
   };
+
 
   const logout = () => {
     persistCurrentUser(null);
