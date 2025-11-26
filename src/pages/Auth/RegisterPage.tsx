@@ -3,7 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { Check, Home, Lock, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -15,9 +22,28 @@ import {
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth";
 
-//imports for GlassGrid. Nacim do not get mad, it looks so cool
+// imports for GlassGrid. Nacim do not get mad, it looks so cool
 import { GlassGrid } from "@/components/GlassGrid";
 
+type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
+
+const BENEFITS = [
+  "One login for payments, maintenance, and messages",
+  "Role-aware dashboards for tenants and landlords",
+  "Safe sandbox: we only mock a simple CRUD login",
+];
+
+// 🔧 Vite glob import with the new `query` + `import` options
+const registerImageModules = import.meta.glob<string>(
+  "../../assets/register/*.{png,jpg,jpeg,webp}",
+  {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }
+);
+
+// Build the array for GlassGrid
 const REGISTER_IMAGES = Object.entries(registerImageModules).map(
   ([path, url]) => {
     const fileName = path.split("/").pop() ?? "";
@@ -32,24 +58,6 @@ const REGISTER_IMAGES = Object.entries(registerImageModules).map(
   }
 );
 
- 
-
-const BENEFITS = [
-  "One login for payments, maintenance, and messages",
-  "Role-aware dashboards for tenants and landlords",
-  "Safe sandbox: we only mock a simple CRUD login",
-];
-
-const registerImageModules = import.meta.glob<
-  string
->("../../assets/register/*.{png,jpg,jpeg,webp}", {
-  eager: true,
-  as: "url",
-});
-
-type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
-
- 
 export function RegisterPage() {
   const navigate = useNavigate();
   const { registerUser } = useAuth();
@@ -122,11 +130,10 @@ export function RegisterPage() {
               ))}
             </ul>
 
-            {/* 👉 NEW: glassmorphic grid with all images in src/assets/register */}
+            {/* glassmorphic grid with all images in src/assets/register */}
             <div className="mt-4 rounded-3xl bg-sky-50/40 p-2 sm:p-3">
               <GlassGrid images={REGISTER_IMAGES} />
             </div>
-
           </section>
 
           <section>
@@ -145,7 +152,10 @@ export function RegisterPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Role</label>
-                    <Select value={role} onValueChange={(value) => setRole(value as FormRole)}>
+                    <Select
+                      value={role}
+                      onValueChange={(value) => setRole(value as FormRole)}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select your role" />
                       </SelectTrigger>
@@ -157,7 +167,9 @@ export function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Full name</label>
+                    <label className="text-sm font-medium text-slate-700">
+                      Full name
+                    </label>
                     <Input
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
@@ -167,7 +179,9 @@ export function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Password</label>
+                    <label className="text-sm font-medium text-slate-700">
+                      Password
+                    </label>
                     <Input
                       type="password"
                       value={password}
@@ -189,8 +203,11 @@ export function RegisterPage() {
                     {isSubmitting ? "Creating..." : "Create account"}
                   </Button>
                   <p className="text-center text-xs text-slate-500">
-                    Already have an account? {" "}
-                    <Link to="/auth/login" className="text-sky-600 hover:text-sky-700">
+                    Already have an account?{" "}
+                    <Link
+                      to="/auth/login"
+                      className="text-sky-600 hover:text-sky-700"
+                    >
                       Go to login
                     </Link>
                   </p>
