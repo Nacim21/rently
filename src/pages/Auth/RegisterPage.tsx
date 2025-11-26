@@ -15,7 +15,24 @@ import {
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth";
 
-type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
+//imports for GlassGrid. Nacim do not get mad, it looks so cool
+import { GlassGrid } from "@/components/GlassGrid";
+
+const REGISTER_IMAGES = Object.entries(registerImageModules).map(
+  ([path, url]) => {
+    const fileName = path.split("/").pop() ?? "";
+    const label = fileName
+      .replace(/\.[^/.]+$/, "") // remove extension
+      .replace(/[-_]/g, " "); // nicer label
+
+    return {
+      src: url as string,
+      label,
+    };
+  }
+);
+
+ 
 
 const BENEFITS = [
   "One login for payments, maintenance, and messages",
@@ -23,6 +40,16 @@ const BENEFITS = [
   "Safe sandbox: we only mock a simple CRUD login",
 ];
 
+const registerImageModules = import.meta.glob<
+  string
+>("../../assets/register/*.{png,jpg,jpeg,webp}", {
+  eager: true,
+  as: "url",
+});
+
+type FormRole = Extract<UserRole, "Tenant" | "Landlord">;
+
+ 
 export function RegisterPage() {
   const navigate = useNavigate();
   const { registerUser } = useAuth();
@@ -94,6 +121,12 @@ export function RegisterPage() {
                 </li>
               ))}
             </ul>
+
+            {/* 👉 NEW: glassmorphic grid with all images in src/assets/register */}
+            <div className="mt-4 rounded-3xl bg-sky-50/40 p-2 sm:p-3">
+              <GlassGrid images={REGISTER_IMAGES} />
+            </div>
+
           </section>
 
           <section>
