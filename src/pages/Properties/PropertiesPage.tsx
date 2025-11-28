@@ -40,85 +40,197 @@ type ApiProperty = Partial<PropertySummary> & {
 function PropertiesPageInternal() {
   const { currentUser } = useAuth();
 
+  const [properties, setProperties] = useState<PropertySummary[]>([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
-    MOCK_PROPERTIES[1]?.id ?? null // visually default to Pine Plaza
+    null
   );
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [newProperty, setNewProperty] = useState<PropertyFormState>({
+    name: "",
+    addressLine1: "",
+    city: "",
+    state: "",
+    country: "",
+    imageUrl: "",
+    totalUnits: 0,
+    occupiedUnits: 0,
+    monthlyRentTotal: 0,
+  });
+
+  const apiBase = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
+  const currentUserId = currentUser?.id;
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      setIsLoading(true);
+      setLoadError(null);
+      setProperties([]);
+      setSelectedPropertyId(null);
+
+      try {
+        if (!currentUserId) {
+          setLoadError("You must be logged in to view properties.");
+          return;
+        }
+
+        const url = `${apiBase}/api/properties/`;
+        console.log("👉 Fetching properties from:", url);
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`Failed to load properties (${response.status})`);
+        }
+
+        const data = (await response.json()) as ApiProperty[];
+        const normalized = Array.isArray(data)
+          ? data
+              .filter((property) => {
+                const owner = property.owner ?? property.owner_id;
+                return owner !== undefined && String(owner) === String(currentUserId);
+              })
+              .map(normalizeProperty)
+          : [];
+
+        setProperties(normalized);
+
+        setSelectedPropertyId(normalized[0]?.id ?? null);
+      } catch (error) {
+        console.error("Failed to fetch properties", error);
+        setLoadError(
+          error instanceof Error
+            ? error.message
+            : "Unable to load properties right now."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, [apiBase, currentUserId]);
 
   if (currentUser && currentUser.role !== LANDLORD_ROLE) {
-    // Tenant hits this route → send back to dashboard
     return <Navigate to="/dashboard" replace />;
   }
 
-  const selectedProperty = MOCK_PROPERTIES.find(
-    (property) => property.id === selectedPropertyId
+  const selectedProperty = useMemo(
+    () => properties.find((property) => property.id === selectedPropertyId),
+    [properties, selectedPropertyId]
   );
 
-  const unitsForSelected = selectedProperty
-    ? MOCK_UNITS.filter((unit) => unit.propertyId === selectedProperty.id)
-    : [];
+  const handleCreateProperty = async () => {
+    if (!currentUser) {
+      setSubmitError("You must be logged in to create a property.");
+      return;
+    }
+
+    const ownerId = currentUser.id;
+
+    if (!ownerId) {
+      setSubmitError("Missing user information. Please sign in again.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const payload = {
+        name: newProperty.name,
+        addressLine1: newProperty.addressLine1,
+        city: newProperty.city,
+        state: newProperty.state,
+        country: newProperty.country,
+        imageUrl: newProperty.imageUrl || DEFAULT_IMAGE_URL,
+        totalUnits: newProperty.totalUnits,
+        occupiedUnits: newProperty.occupiedUnits,
+        monthlyRentTotal: newProperty.monthlyRentTotal,
+      };
+
+      const response = await fetch(
+        `${apiBase}/api/properties/create/${ownerId}/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => null);
+        const detail = (errorBody as { detail?: string })?.detail;
+        throw new Error(detail ?? "Unable to create property.");
+      }
+
+      const created = normalizeProperty(await response.json());
+      setProperties((prev) => [created, ...prev]);
+      setSelectedPropertyId(created.id);
+      setIsDialogOpen(false);
+      setNewProperty({
+        name: "",
+        addressLine1: "",
+        city: "",
+        state: "",
+        country: "",
+        imageUrl: "",
+        totalUnits: 0,
+        occupiedUnits: 0,
+        monthlyRentTotal: 0,
+      });
+
+      toast("Property created", {
+        description: `${created.name} has been added to your portfolio.`,
+      });
+    } catch (error) {
+      console.error("Failed to create property", error);
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Unable to create property right now."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleFormChange = <K extends keyof PropertyFormState>(
+    key: K,
+    value: PropertyFormState[K]
+  ) => {
+    setNewProperty((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   return (
     <div className="space-y-8">
-      {/* Header + primary action */}
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Properties
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Manage your rental properties and units.
-          </p>
-        </div>
+      <PropertiesHeader onAddProperty={() => setIsDialogOpen(true)} />
 
-        <Button size="sm" className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Property
-        </Button>
-      </div>
+      <PropertiesGridSection
+        properties={properties}
+        selectedPropertyId={selectedPropertyId}
+        isLoading={isLoading}
+        loadError={loadError}
+        onSelectProperty={(propertyId) => setSelectedPropertyId(propertyId)}
+        onRetry={() => window.location.reload()}
+      />
 
-      {/* Properties grid */}
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {MOCK_PROPERTIES.map((property) => (
-          <PropertyCard
-            key={property.id}
-            property={property}
-            isSelected={property.id === selectedPropertyId}
-            onSelect={() => setSelectedPropertyId(property.id)}
-          />
-        ))}
-      </div>
+      <UnitsSection property={selectedProperty} />
 
-      {/* Units for selected property */}
-      {selectedProperty && (
-        <Card className="mt-4">
-          <CardHeader className="flex flex-row items-center justify-between gap-4">
-            <div>
-              <CardTitle>{selectedProperty.name} - Units</CardTitle>
-              <CardDescription>
-                View occupancy, rent, and lease details for each unit.
-              </CardDescription>
-            </div>
-            <Button size="sm" className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Unit
-            </Button>
-          </CardHeader>
-
-          <CardContent>
-            {unitsForSelected.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No units found for this property yet.
-              </p>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {unitsForSelected.map((unit) => (
-                  <UnitCard key={unit.id} unit={unit} />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      <AddPropertyDialog
+        open={isDialogOpen}
+        newProperty={newProperty}
+        isSubmitting={isSubmitting}
+        submitError={submitError}
+        onOpenChange={setIsDialogOpen}
+        onChange={handleFormChange}
+        onSubmit={handleCreateProperty}
+      />
     </div>
   );
 }
@@ -129,3 +241,25 @@ export function PropertiesPage() {
 }
 
 export default PropertiesPage;
+
+function normalizeProperty(property: ApiProperty): PropertySummary {
+  return {
+    id: String(property.id),
+    name: property.name ?? "Untitled property",
+    addressLine1:
+      property.addressLine1 ??
+      property.address_line1 ??
+      property.address ??
+      "Address unavailable",
+    city: property.city ?? "",
+    state: property.state ?? "",
+    country: property.country ?? "",
+    imageUrl:
+      property.imageUrl ?? property.image_url ?? property.image ?? DEFAULT_IMAGE_URL,
+    totalUnits:
+      property.totalUnits ?? property.total_units ?? property.units?.length ?? 0,
+    occupiedUnits: property.occupiedUnits ?? property.occupied_units ?? 0,
+    monthlyRentTotal: property.monthlyRentTotal ?? property.monthly_rent_total ?? 0,
+    units: property.units ?? [],
+  };
+}
