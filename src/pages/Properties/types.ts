@@ -11,6 +11,7 @@ export type PropertySummary = {
   totalUnits: number;
   occupiedUnits: number;
   monthlyRentTotal: number; // aggregated rent for this property
+  units?: UnitSummary[];
 };
 
 export type UnitStatus = "occupied" | "vacant";
@@ -22,6 +23,5 @@ export type UnitSummary = {
   status: UnitStatus;
   monthlyRent: number;
   tenantName?: string; // undefined when vacant
-  // backend will send ISO 8601 string later, e.g. "2025-06-30"
   leaseEndDate?: string;
 };
