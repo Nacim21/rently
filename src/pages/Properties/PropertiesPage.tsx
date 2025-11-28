@@ -1,18 +1,9 @@
 // src/pages/Properties/PropertiesPage.tsx
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth";
 
@@ -20,7 +11,31 @@ import { MOCK_PROPERTIES, MOCK_UNITS } from "./mockData";
 import { PropertyCard } from "./components/PropertyCard";
 import { UnitCard } from "./components/UnitCard";
 
+import { AddPropertyDialog } from "./components/AddPropertyDialog";
+import { PropertiesGridSection } from "./components/PropertiesGridSection";
+import { PropertiesHeader } from "./components/PropertiesHeader";
+import { UnitsSection } from "./components/UnitsSection";
+import type { PropertySummary, UnitSummary } from "./types";
+
 const LANDLORD_ROLE: UserRole = "Landlord";
+const DEFAULT_IMAGE_URL =
+  "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80";
+
+export type PropertyFormState = Omit<PropertySummary, "id">;
+
+type ApiProperty = Partial<PropertySummary> & {
+  id: string | number;
+  address?: string;
+  address_line1?: string;
+  image?: string;
+  image_url?: string;
+  total_units?: number;
+  occupied_units?: number;
+  monthly_rent_total?: number;
+  owner?: string | number;
+  owner_id?: string | number;
+  units?: UnitSummary[];
+};
 
 function PropertiesPageInternal() {
   const { currentUser } = useAuth();
