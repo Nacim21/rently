@@ -1,4 +1,25 @@
-return (
+import { Plus } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import { UnitCard } from "./UnitCard";
+import type { PropertySummary } from "../types";
+
+interface UnitsSectionProps {
+  property?: PropertySummary;
+}
+
+export function UnitsSection({ property }: UnitsSectionProps) {
+  if (!property) return null;
+
+  return (
     <Card className="mt-4">
       <CardHeader className="flex flex-row items-center justify-between gap-4">
         <div>
@@ -29,3 +50,5 @@ return (
     </Card>
   );
 }
+
+export default UnitsSection;
