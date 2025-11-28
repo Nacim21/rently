@@ -7,10 +7,6 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth";
 
-import { MOCK_PROPERTIES, MOCK_UNITS } from "./mockData";
-import { PropertyCard } from "./components/PropertyCard";
-import { UnitCard } from "./components/UnitCard";
-
 import { AddPropertyDialog } from "./components/AddPropertyDialog";
 import { PropertiesGridSection } from "./components/PropertiesGridSection";
 import { PropertiesHeader } from "./components/PropertiesHeader";
@@ -235,7 +231,6 @@ function PropertiesPageInternal() {
   );
 }
 
-// Named export (matches guidelines) and default export for router convenience
 export function PropertiesPage() {
   return <PropertiesPageInternal />;
 }
