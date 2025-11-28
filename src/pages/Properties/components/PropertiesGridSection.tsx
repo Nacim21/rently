@@ -1,4 +1,12 @@
  
+import { PropertyCard } from "./PropertyCard";
+import type { PropertySummary } from "../types";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
 
 interface PropertiesGridSectionProps {
   properties: PropertySummary[];
