@@ -78,7 +78,7 @@ function PropertiesPageInternal() {
         }
 
         const url = `${apiBase}/api/properties/`;
-        console.log("👉 Fetching properties from:", url);
+        console.log(" Fetching properties from:", url);
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -162,17 +162,15 @@ function PropertiesPageInternal() {
         // send the UI propertyNumber as `property_number` (string)
         property_number: String(newProperty.propertyNumber ?? ""),
         address: addressParts.join(", "),
+        // backend expects integers for unit counts
         total_units: Number(newProperty.totalUnits ?? 0),
         occupied_units: Number(newProperty.occupiedUnits ?? 0),
-        // backend expects a string like "0.00"
-        monthly_rent_total:
-          typeof newProperty.monthlyRentTotal === "number"
-            ? newProperty.monthlyRentTotal.toFixed(2)
-            : String(newProperty.monthlyRentTotal),
+        // backend expects a numeric value (e.g. 0.0)
+        monthly_rent_total: Number(newProperty.monthlyRentTotal ?? 0),
       };
 
       // Helpful debug log to inspect exactly what's being sent
-      console.log("👉 Creating property - POST payload:", payload);
+      console.log(" Creating property - POST payload:", payload);
 
       // Build headers and include Authorization if available on currentUser
       const headers: Record<string, string> = {
