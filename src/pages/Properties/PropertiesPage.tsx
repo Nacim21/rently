@@ -135,30 +135,74 @@ function PropertiesPageInternal() {
     setSubmitError(null);
 
     try {
+      // Shape payload to match backend expectation:
+      // {
+      //   "owner": 3,
+      //   "name": "Sunset Villa",
+      //   "property_number": "A12",
+      //   "address": "1234 Sunset Street, El Paso, TX",
+      //   "total_units": 0,
+      //   "occupied_units": 0,
+      //   "monthly_rent_total": "0.00"
+      // }
+      const addressParts = [
+        newProperty.addressLine1,
+        newProperty.city,
+        newProperty.state,
+        newProperty.country,
+      ].filter(Boolean);
+
       const payload = {
+        owner: Number(ownerId),
         name: newProperty.name,
-        addressLine1: newProperty.addressLine1,
-        city: newProperty.city,
-        state: newProperty.state,
-        country: newProperty.country,
-        totalUnits: newProperty.totalUnits,
-        occupiedUnits: newProperty.occupiedUnits,
-        monthlyRentTotal: newProperty.monthlyRentTotal,
+        // property_number is not currently captured in the UI — leave empty or
+        // update AddPropertyDialog to include this field if required.
+        property_number: "",
+        address: addressParts.join(", "),
+        total_units: Number(newProperty.totalUnits ?? 0),
+        occupied_units: Number(newProperty.occupiedUnits ?? 0),
+        // backend expects a string like "0.00"
+        monthly_rent_total:
+          typeof newProperty.monthlyRentTotal === "number"
+            ? newProperty.monthlyRentTotal.toFixed(2)
+            : String(newProperty.monthlyRentTotal),
       };
 
-      const response = await fetch(
-        `${apiBase}/api/properties/create/${ownerId}/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      // Helpful debug log to inspect exactly what's being sent
+      console.log("👉 Creating property - POST payload:", payload);
+
+      // Build headers and include Authorization if available on currentUser
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      const maybeToken =
+        (currentUser as any)?.token ?? (currentUser as any)?.accessToken ?? null;
+      if (maybeToken) {
+        headers.Authorization = `Bearer ${maybeToken}`;
+      }
+
+      const response = await fetch(`${apiBase}/api/properties/create/${ownerId}/`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
-        const errorBody = await response.json().catch(() => null);
-        const detail = (errorBody as { detail?: string })?.detail;
-        throw new Error(detail ?? "Unable to create property.");
+        // try to read body for debugging
+        const text = await response.text().catch(() => null);
+        console.error(
+          "Create property failed:",
+          response.status,
+          response.statusText,
+          "response body:",
+          text
+        );
+        let parsed = null;
+        try {
+          parsed = text ? JSON.parse(text) : null;
+        } catch {}
+        const detail = (parsed as { detail?: string })?.detail;
+        throw new Error(detail ?? `Unable to create property (status ${response.status}).`);
       }
 
       const created = normalizeProperty(await response.json());
