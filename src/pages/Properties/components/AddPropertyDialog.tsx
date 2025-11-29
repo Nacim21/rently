@@ -163,6 +163,20 @@ export function AddPropertyDialog({
             </div>
           </div>
 
+          {/* Property number (sent as `property_number`) */}
+          <div className="grid gap-2">
+            <Label className="text-gray-200" htmlFor="propertyNumber">
+              Property number
+            </Label>
+            <Input
+              id="propertyNumber"
+              placeholder="e.g. A12"
+              value={newProperty.propertyNumber ?? ""}
+              onChange={(e) => onChange("propertyNumber", e.target.value)}
+              className="bg-gray-900 text-gray-100 placeholder:text-gray-500 border-gray-800"
+            />
+          </div>
+
           {submitError && <p className="text-sm text-destructive">{submitError}</p>}
         </div>
 

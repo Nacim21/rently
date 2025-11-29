@@ -18,7 +18,10 @@ const DEFAULT_IMAGE_URL =
   "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80";
 
 // Remove imageUrl from the property form state (we no longer collect it in the UI)
-export type PropertyFormState = Omit<PropertySummary, "id" | "imageUrl">;
+// Add propertyNumber for the UI; it will be sent as `property_number` to the API.
+export type PropertyFormState = Omit<PropertySummary, "id" | "imageUrl"> & {
+  propertyNumber?: string;
+};
 
 type ApiProperty = Partial<PropertySummary> & {
   id: string | number;
@@ -52,6 +55,7 @@ function PropertiesPageInternal() {
     city: "",
     state: "",
     country: "",
+    propertyNumber: "",
     totalUnits: 0,
     occupiedUnits: 0,
     monthlyRentTotal: 0,
@@ -155,9 +159,8 @@ function PropertiesPageInternal() {
       const payload = {
         owner: Number(ownerId),
         name: newProperty.name,
-        // property_number is not currently captured in the UI — leave empty or
-        // update AddPropertyDialog to include this field if required.
-        property_number: "",
+        // send the UI propertyNumber as `property_number` (string)
+        property_number: String(newProperty.propertyNumber ?? ""),
         address: addressParts.join(", "),
         total_units: Number(newProperty.totalUnits ?? 0),
         occupied_units: Number(newProperty.occupiedUnits ?? 0),
@@ -215,6 +218,7 @@ function PropertiesPageInternal() {
         city: "",
         state: "",
         country: "",
+        propertyNumber: "",
         totalUnits: 0,
         occupiedUnits: 0,
         monthlyRentTotal: 0,
