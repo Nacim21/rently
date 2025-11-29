@@ -112,19 +112,6 @@ export function AddPropertyDialog({
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label className="text-gray-200" htmlFor="imageUrl">
-              Image URL
-            </Label>
-            <Input
-              id="imageUrl"
-              value={newProperty.imageUrl}
-              onChange={(event) => onChange("imageUrl", event.target.value)}
-              placeholder="https://..."
-              className="bg-gray-900 text-gray-100 placeholder:text-gray-500 border-gray-800"
-            />
-          </div>
-
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="grid gap-2">
               <Label className="text-gray-200" htmlFor="totalUnits">

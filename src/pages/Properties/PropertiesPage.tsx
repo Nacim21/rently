@@ -17,7 +17,8 @@ const LANDLORD_ROLE: UserRole = "Landlord";
 const DEFAULT_IMAGE_URL =
   "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80";
 
-export type PropertyFormState = Omit<PropertySummary, "id">;
+// Remove imageUrl from the property form state (we no longer collect it in the UI)
+export type PropertyFormState = Omit<PropertySummary, "id" | "imageUrl">;
 
 type ApiProperty = Partial<PropertySummary> & {
   id: string | number;
@@ -51,7 +52,6 @@ function PropertiesPageInternal() {
     city: "",
     state: "",
     country: "",
-    imageUrl: "",
     totalUnits: 0,
     occupiedUnits: 0,
     monthlyRentTotal: 0,
@@ -141,7 +141,6 @@ function PropertiesPageInternal() {
         city: newProperty.city,
         state: newProperty.state,
         country: newProperty.country,
-        imageUrl: newProperty.imageUrl || DEFAULT_IMAGE_URL,
         totalUnits: newProperty.totalUnits,
         occupiedUnits: newProperty.occupiedUnits,
         monthlyRentTotal: newProperty.monthlyRentTotal,
@@ -172,7 +171,6 @@ function PropertiesPageInternal() {
         city: "",
         state: "",
         country: "",
-        imageUrl: "",
         totalUnits: 0,
         occupiedUnits: 0,
         monthlyRentTotal: 0,
